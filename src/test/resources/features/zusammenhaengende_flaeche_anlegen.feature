@@ -2,6 +2,8 @@
 Funktionalität: Das Plugin muss der GUI die Möglichkeit geben zu prüfen ob ein Frosch beim Anlegen
   nach Zug 1 an eine bestehende Fläche angrenzt.
 
+  1:1
+
   Szenario: Der Benutzer möchte einen Frosch auf das Spielfeld legen
     Angenommen ein Spiel läuft
     Und Spieler Blau ist am Zug

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.fhkiel.tsw.Gamelogic;
 import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
+import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 
 public class BagSteps {
@@ -41,5 +42,26 @@ public class BagSteps {
                 .isEqualTo(erwarteteFrösche);
     }
 
+    @Angenommen("Spieler Blau hat zwei Frösche auf der Hand")
+    public void spielerBlauHatZweiFroscheAufDerHand() {
+    }
+
+    @Wenn("Spieler Blau die Anzahl der Frösche auf Hand des Spielers Blau abfragt")
+    public void spielerBlauDieAnzahlDerFroscheAufHandDesSpielersBlauAbfragt() {
+    }
+
+    @Dann("ist die Anzahl der Frösche auf der Hand des Spielers Blau {int}")
+    public void istDieAnzahlDerFroscheAufDerHandDesSpielersBlau(int arg0) {
+    }
+
+    @Und("Spieler Blau legt einen Frosch an")
+    public void spielerBlauLegtEinenFroschAn() {
+    }
+
+
+
+/*    @Und("Spieler Blau legt einen Frosch an")
+    public void spielerBlauLegtEinenFroschAn() {
+    }*/
 }
 
