@@ -7,14 +7,37 @@ import java.util.List;
 import java.util.Set;
 
 public class Gamelogic implements Game {
+
+    private Color[] players;
+    private Bag gameBag;
     @Override
     public boolean newGame(int numberOfPlayers) {
-        return false;
+
+        if(numberOfPlayers < 2 || numberOfPlayers > 4)
+            return false;
+
+        players = new Color[numberOfPlayers];
+
+        Color color[] = {Color.Red, Color.Blue, Color.Green, Color.Black, Color.None,Color.White,Color.Black};
+
+        gameBag = new Bag(numberOfPlayers*10);
+
+        for(int i = 0; i < numberOfPlayers; ++i){
+            players[i] = color[i];
+        }
+        startGame(numberOfPlayers);
+        return true;
     }
 
     @Override
     public Color[] players() {
-        return new Color[0];
+
+
+        return this.players;
+    }
+
+    public int numberOfPlayers() {
+        return players.length;
     }
 
     @Override
@@ -44,6 +67,10 @@ public class Gamelogic implements Game {
 
     @Override
     public Color winner() {
+
+        Color currentplayers[]=players();
+
+
         return null;
     }
 
@@ -54,6 +81,8 @@ public class Gamelogic implements Game {
 
     @Override
     public boolean load(String filename) {
+
+
         return false;
     }
 
