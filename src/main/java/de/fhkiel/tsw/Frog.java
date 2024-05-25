@@ -7,7 +7,6 @@ public class Frog {
 
     private Color frogColor;
 
-
     public Frog (){
         this.frogColor = Color.None;
     }
