@@ -61,8 +61,10 @@ public class Bag {
     public void takeFrog(Color color) {
         if(numoffrogs > 0) {
             numoffrogs = numoffrogs - 1;
-            frogsInBag.removeIf(frog -> frog.getFrogColor() == color);
+            frogsInBag.removeIf(frog -> frog.getFrogColor() == color && numoffrogs > 0);
+
         }
+
     }
 
     public List<Frog> getFrogsInBag() {

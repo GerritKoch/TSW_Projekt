@@ -20,6 +20,7 @@ public class MyStepdefs {
     Gamelogic logic;
     private int anzahlSpieler;
     private int numofFrogs;
+    private int numofFrogsInHand;
 
     private boolean gameStarted;
 
@@ -33,6 +34,7 @@ public class MyStepdefs {
     public void dasSpielIstMitSpielernGestartet(Integer arg0) {
         container.logicUnderTest = new Gamelogic();
         gameStarted = container.logicUnderTest.newGame(arg0);
+        anzahlSpieler = arg0;
         System.out.println("Game started: " + gameStarted);
         //throw new io.cucumber.java.PendingException();
     }
@@ -177,5 +179,51 @@ public class MyStepdefs {
         assertThat(container.logicUnderTest.frogsInBag()).isEqualTo(int1);
 
     }
+
+    @Wenn("jeder Spieler hat zweimal gezogen")
+    public void jeder_spieler_hat_zweimal_gezogen() {
+        // Write code here that turns the phrase above into concrete actions
+        container.logicUnderTest.takeFrogFromBag();
+        container.logicUnderTest.takeFrogFromBag();
+
+
+    }
+
+    @Wenn("die Anzahl der Spielsteine in der Hand abgefragt wird")
+    public void die_anzahl_der_spielsteine_in_der_hand_abgefragt_wird() {
+        // Write code here that turns the phrase above into concrete actions
+        switch (anzahlSpieler) {
+            case 2:
+                numofFrogs = container.logicUnderTest.getFrogsInHand(Color.Red).size();
+                numofFrogs += container.logicUnderTest.getFrogsInHand(Color.Blue).size();
+                break;
+            case 3:
+                int a = container.logicUnderTest.getFrogsInHand(Color.Red).size();
+                int b = container.logicUnderTest.getFrogsInHand(Color.Blue).size();
+                int c = container.logicUnderTest.getFrogsInHand(Color.Green).size();
+                numofFrogs = a + b + c;
+                break;
+            case 4:
+                int d = container.logicUnderTest.getFrogsInHand(Color.Red).size();
+                int e = container.logicUnderTest.getFrogsInHand(Color.Blue).size();
+                int f = container.logicUnderTest.getFrogsInHand(Color.Green).size();
+                int g = container.logicUnderTest.getFrogsInHand(Color.Black).size();
+                numofFrogs = d + e + f + g;
+                break;
+            default:
+                // Handle the case where anzahlSpieler is not 2, 3, or 4
+                break;
+        }
+
+    }
+
+    @Dann("wurden {int} Spielsteine gezogen")
+    public void wurden_spielsteine_gezogen(Integer int1) {
+        // Write code here that turns the phrase above into concrete actions
+
+        assertThat(numofFrogs).isEqualTo(int1);
+
+    }
+
 
 }

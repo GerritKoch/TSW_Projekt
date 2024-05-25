@@ -53,19 +53,20 @@ public class Gamelogic implements Game {
 
 
 
-        //for(int i = 0; i < numberOfPlayers; ++i){
-        //    players[i] = color[i];
-       // }
-
-        int j =0;
-        for(Color singleColor : colorList){
-
-            if( j < numberOfPlayers){
-                players[j]= new Player(singleColor);
-                j++;
-            }
-
+        for(int i = 0; i < numberOfPlayers; ++i){
+            players[i] = new Player(colorList.get(i));
         }
+
+
+//        int j =0;
+//        for(Color singleColor : colorList){
+//
+//            if( j < numberOfPlayers){
+//                players[j]= new Player(singleColor);
+//                j++;
+//            }
+//
+//        }
 
         gameBag = new Bag(numberOfPlayers*10,colorList);
        // startGame(numberOfPlayers,gameBag);
@@ -111,8 +112,16 @@ public class Gamelogic implements Game {
 
     @Override
     public List<Color> getFrogsInHand(Color player) {
-        return null;
-    }
+        List<Color> frogsInHand = new ArrayList<>();
+        for(Player play : players){
+            if(play.getPlayerColor() == player){
+                for(Frog frog : play.getFrogsInHand()){
+                    frogsInHand.add(frog.getFrogColor());
+                }
+            }
+        }
+        return frogsInHand;
+    };
 
     @Override
     public Set<Position> getBoard() {
@@ -169,7 +178,30 @@ public class Gamelogic implements Game {
     }
 
     public void takeFrogFromBag() {
-        gameBag.takeFrog();
+        for(Player player : players){
+                if(player.getFrogsInHand().size() < 2)  {
+                    gameBag.takeFrog(player.getPlayerColor());
+                    player.setMyFrogs(gameBag.getFrogsInBag(player.getPlayerColor()));
+                    player.setFrogsInHand(new Frog(player.getPlayerColor()));
+                }
+
+        }
+    }
+
+    public void takeFrogFromBag(Color color) {
+
+
+        for(Player player : players){
+            if(player.getPlayerColor() == color){
+                if(player.getFrogsInHand().size() < 2)  {
+                    gameBag.takeFrog(color);
+                    player.setMyFrogs(gameBag.getFrogsInBag(color));
+                    player.setFrogsInHand(new Frog(color));
+                }
+            }
+        }
+
+
     }
 
     public boolean endGame() {
@@ -192,5 +224,9 @@ public class Gamelogic implements Game {
 
     public Bag getGameBag() {
         return gameBag;
+    }
+
+    public Player[] getPlayers() {
+        return players;
     }
 }
