@@ -17,11 +17,13 @@ public class StartSteps {
 
     boolean gameStarted;
 
-    @Wenn("das Spiel( ist) mit {int} Spielern gestartet( wird)")
-    public void das_spiel_mit_spielern_gestartet_wird(int anzahl) {
-        container.logicUnderTest = new Gamelogic();
-        gameStarted = container.logicUnderTest.newGame(anzahl);
-    }
+//    @Wenn("das Spiel( ist) mit {int} Spielern gestartet( wird)")
+//    public void das_spiel_mit_spielern_gestartet_wird(int anzahl) {
+//        container.logicUnderTest = new Gamelogic();
+//        gameStarted = container.logicUnderTest.newGame(anzahl);
+//    }
+
+
 
     @Dann("wird ein Spiel erstellt")
     public void wird_ein_spiel_erstellt() {

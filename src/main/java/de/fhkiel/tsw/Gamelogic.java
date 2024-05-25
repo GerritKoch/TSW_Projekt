@@ -5,14 +5,21 @@ import de.fhkiel.tsw.armyoffrogs.Game;
 import de.fhkiel.tsw.armyoffrogs.Position;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public class Gamelogic implements Game {
 
     private Player[] players;
+    private List<Player> playerList;
     private Bag gameBag;
     private boolean spielLaueft;
+    private int numOfPlayers = 0;
+    private int gameRound;
+    private boolean frogonBoard = false;
+
+
     @Override
     public boolean newGame(int numberOfPlayers) {
 
@@ -24,7 +31,10 @@ public class Gamelogic implements Game {
 
         }
 
+        gameRound = 0;
+        numOfPlayers = numberOfPlayers;
         players = new Player[numberOfPlayers];
+        //playerList = new ArrayList<>();
 
         Color color[] = {Color.Red, Color.Blue, Color.Green, Color.Black,Color.White,Color.Black};
         List<Color> colorList = new ArrayList<>();
@@ -32,7 +42,16 @@ public class Gamelogic implements Game {
         colorList.add(Color.Blue);
         colorList.add(Color.Green);
         colorList.add(Color.Black);
-        gameBag = new Bag(numberOfPlayers*10,colorList);
+
+        //Collections.shuffle(colorList);
+        if (numberOfPlayers < colorList.size()) {
+            // If num is smaller, remove elements to decrease the size
+            for (int i = colorList.size() - 1; i >= numberOfPlayers; i--) {
+                colorList.remove(i);
+            }
+        }
+
+
 
         //for(int i = 0; i < numberOfPlayers; ++i){
         //    players[i] = color[i];
@@ -47,9 +66,12 @@ public class Gamelogic implements Game {
             }
 
         }
-        startGame(numberOfPlayers,gameBag);
+
+        gameBag = new Bag(numberOfPlayers*10,colorList);
+       // startGame(numberOfPlayers,gameBag);
         return true;
     }
+
 
     @Override
     public Color[] players() {
@@ -70,7 +92,16 @@ public class Gamelogic implements Game {
     }
 
     public int numberOfPlayers() {
-        return players.length;
+        //return players.length;
+        return numOfPlayers;
+    }
+
+    public int numofFrogsPlayed(){
+        int frogsPlayed = 0;
+        for(Player player : players){
+            frogsPlayed += gameBag.getFrogsInBag(player.getPlayerColor()).size();
+        }
+        return gameBag.getNumoffrogs();
     }
 
     @Override
@@ -126,6 +157,10 @@ public class Gamelogic implements Game {
         return gameBag.getNumoffrogs();
     }
 
+    public int frogsInBag_withColor(Color color) {
+        return gameBag.getFrogsInBag(color).size();
+    }
+
     public void startGame(int spieler, Bag gamebag) {
         //bag = new Bag(spieler*10);
         for (int i = 0; i < 2*spieler; ++i){
@@ -135,5 +170,27 @@ public class Gamelogic implements Game {
 
     public void takeFrogFromBag() {
         gameBag.takeFrog();
+    }
+
+    public boolean endGame() {
+        spielLaueft = false;
+        return !spielLaueft;
+    }
+
+    public void setGameRound(int gameRound) {
+        this.gameRound = gameRound;
+    }
+
+    private void updateBagContent(){
+        gameBag.takeFrog();
+    }
+
+
+    public boolean isFrogonBoard() {
+        return frogonBoard;
+    }
+
+    public Bag getGameBag() {
+        return gameBag;
     }
 }

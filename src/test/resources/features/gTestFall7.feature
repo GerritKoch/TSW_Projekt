@@ -1,4 +1,5 @@
 #language:de
+
 Funktionalität: (AoF-Al-107)  Durch (Nach)ziehen wird vor Spielstart <Anzahl der Spieler>-mal abwechselnd zufällig ein Stein
   aus dem Beutel gezogen, beginnend bei Spieler1.
 
