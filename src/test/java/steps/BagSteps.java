@@ -22,7 +22,8 @@ public class BagSteps {
     @Angenommen("das Spiel ist mit {int} Spielern gestartet")
     public void das_spiel_ist_mit_spielern_gestartet(Integer spieler) {
         logic = new Gamelogic();
-        logic.startGame(spieler);
+        //logic.startGame(spieler);
+        logic.newGame(spieler);
     }
     @Angenommen("der (erste)(zweite)(dritte)(vierte) Spieler hat {int} (Frosch)(Frösche) gezogen")
     public void der_erste_spieler_hat_frösche_gezogen(Integer anzahl) {
