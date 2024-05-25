@@ -1,6 +1,6 @@
 #language:de
 
-Funktionalität: (AoF-Al-1xx)
+Funktionalität: (AoF-Al-114) Die erste Spielphase ist Nachziehen, dann Bewegen, dann Anlegen.
 
   Szenario:
   Testfall:
