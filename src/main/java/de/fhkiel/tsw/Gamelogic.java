@@ -3,14 +3,13 @@ package de.fhkiel.tsw;
 import de.fhkiel.tsw.armyoffrogs.Color;
 import de.fhkiel.tsw.armyoffrogs.Game;
 import de.fhkiel.tsw.armyoffrogs.Position;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+///
 public class Gamelogic implements Game {
-
     private Player[] players;
     private List<Player> playerList;
     private Bag gameBag;
@@ -18,17 +17,16 @@ public class Gamelogic implements Game {
     private int numOfPlayers = 0;
     private int gameRound;
     private boolean frogonBoard = false;
-
+    private int x;
+    private int y;
+    private List<Frog> frogsOnBoard = new ArrayList<>();
 
     @Override
     public boolean newGame(int numberOfPlayers) {
 
-        if(numberOfPlayers < 2 || numberOfPlayers > 4){
-
+        if (numberOfPlayers < 2 || numberOfPlayers > 4){
             spielLaueft = false;
-
             return false;
-
         }
 
         gameRound = 0;
@@ -93,7 +91,6 @@ public class Gamelogic implements Game {
     }
 
     public int numberOfPlayers() {
-        //return players.length;
         return numOfPlayers;
     }
 
@@ -121,7 +118,7 @@ public class Gamelogic implements Game {
             }
         }
         return frogsInHand;
-    };
+    }
 
     @Override
     public Set<Position> getBoard() {
@@ -140,8 +137,6 @@ public class Gamelogic implements Game {
 
     @Override
     public Color winner() {
-
-        Color currentplayers[]=players();
 
 
         return null;
@@ -192,13 +187,12 @@ public class Gamelogic implements Game {
 
 
         for(Player player : players){
-            if(player.getPlayerColor() == color){
-                if(player.getFrogsInHand().size() < 2)  {
+            if(player.getPlayerColor() == color && player.getFrogsInHand().size() < 2)  {
                     gameBag.takeFrog(color);
                     player.setMyFrogs(gameBag.getFrogsInBag(color));
                     player.setFrogsInHand(new Frog(color));
                 }
-            }
+
         }
 
 
@@ -213,11 +207,6 @@ public class Gamelogic implements Game {
         this.gameRound = gameRound;
     }
 
-    private void updateBagContent(){
-        gameBag.takeFrog();
-    }
-
-
     public boolean isFrogonBoard() {
         return frogonBoard;
     }
@@ -229,4 +218,58 @@ public class Gamelogic implements Game {
     public Player[] getPlayers() {
         return players;
     }
+
+    public void anlegen(Frog frog,int x, int y) {
+
+        try{
+
+            Position currentFrogPosition = new Position(frog.getFrogColor(),x,y,Color.None);
+            frog.setPosition(currentFrogPosition);
+            frog.setFrogInGame(true);
+            frogsOnBoard.add(frog);
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+       Position currentFrogPosition = new Position(frog.getFrogColor(),x,y,Color.None);
+       frog.setPosition(currentFrogPosition);
+        frog.setFrogInGame(true);
+
+    }
+
+    public void bewegen(Frog frog, int x, int y) {
+
+        try{
+
+            Color borderColor = Color.None;
+            if(!frog.isFrogInGame()){
+                return;
+            }
+            for(Frog frog1 : frogsOnBoard){
+                if(frog1.getPosition().x() == x && frog1.getPosition().y() == y){
+                    frog1.setPosition(null);
+                    return;
+                }
+
+                if(frog1.getPosition().x() == x || frog1.getPosition().y() == y){
+                    borderColor = frog1.getPosition().border();
+                }
+
+            }
+            Position currentFrogPosition = new Position(frog.getFrogColor(),x,y,borderColor);
+            frog.setPosition(currentFrogPosition);
+
+        }
+        catch (Exception e){
+            e.printStackTrace();}
+
+
+    }
+
+    public void nachzeihen(Color color) {
+        takeFrogFromBag();
+    }
+
 }

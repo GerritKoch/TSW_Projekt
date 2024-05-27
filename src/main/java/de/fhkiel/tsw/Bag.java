@@ -20,7 +20,7 @@ public class Bag {
         this.baseColorList.add(Color.Green);
         this.baseColorList.add(Color.Black);
         this.numoffrogs = 40;
-        //this(40,baseColorList);
+        this.frogsInBag = new ArrayList<>();
     }
 
 

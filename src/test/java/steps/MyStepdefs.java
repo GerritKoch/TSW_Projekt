@@ -36,7 +36,7 @@ public class MyStepdefs {
         gameStarted = container.logicUnderTest.newGame(arg0);
         anzahlSpieler = arg0;
         System.out.println("Game started: " + gameStarted);
-        //throw new io.cucumber.java.PendingException();
+
     }
 
     @Wenn("die Anzahl der Spieler abgefragt wird")
@@ -66,7 +66,7 @@ public class MyStepdefs {
 
     @Dann("wird das Spiel beendet")
     public void wirdDasSpielBeendet() {
-        assertThat(container.logicUnderTest.numberOfPlayers()).isEqualTo(0);
+        assertThat(container.logicUnderTest.numberOfPlayers()).isZero();
     }
 
     @Angenommen("die Anzahl der Spieler {int} ist großer als vier")
@@ -142,7 +142,7 @@ public class MyStepdefs {
         setFrogColor(color);
 
         numofFrogs = container.logicUnderTest.frogsInBag_withColor(frogColor);
-        //container.logicUnderTest.numberOfFrogs(frogColor);
+
 
     }
 
@@ -161,7 +161,7 @@ public class MyStepdefs {
     @Wenn("Es wurde kein Spielsteine aus der Beutel gezogen")
     public void es_wurde_kein_spielsteine_aus_der_beutel_gezogen() {
         // Write code here that turns the phrase above into concrete actions
-        //assertThat(container.logicUnderTest.frogsInBag()).isEqualTo(40);
+
         assertThat(container.logicUnderTest.getGameBag().isBagFilled()).isTrue();
 
     }
@@ -226,4 +226,19 @@ public class MyStepdefs {
     }
 
 
+    @Angenommen("Es gibt mindestens ein Spielstein auf dem Spielfeld")
+    public void esGibtMindestensEinSpielsteinAufDemSpielfeld() {
+    }
+
+    @Und("eine Position hat kein Nachbarn")
+    public void einePositionHatKeinNachbarn() {
+    }
+
+    @Wenn("ein Stein auf diese Position angelegt")
+    public void einSteinAufDiesePositionAngelegt() {
+    }
+
+    @Dann("wird das Anlegen rückgängig gemacht")
+    public void wirdDasAnlegenRuckgangigGemacht() {
+    }
 }

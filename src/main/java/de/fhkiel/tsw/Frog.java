@@ -1,6 +1,7 @@
 package de.fhkiel.tsw;
 
 import de.fhkiel.tsw.armyoffrogs.Color;
+import de.fhkiel.tsw.armyoffrogs.Position;
 
 public class Frog {
 
@@ -8,6 +9,7 @@ public class Frog {
     private Color frogColor;
     private boolean frogInGame;
     private boolean frogInHand = false;
+    private Position position;
 
 
     public Frog (){
@@ -40,5 +42,13 @@ public class Frog {
 
     public void setFrogInHand(boolean frogInHand) {
         this.frogInHand = frogInHand;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
 }

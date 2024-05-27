@@ -44,4 +44,25 @@ public class Player {
     public void setMyFrogs(List<Frog> myFrogs) {
         this.myFrogs = myFrogs;
     }
+
+
+    public void performActions(Frog frog, int x, int y, Gamelogic gameLogic) {
+        try {
+            gameLogic.bewegen(frog, x, y);
+        } catch (Exception e) {
+            System.out.println("Bewegen action failed: " + e.getMessage());
+        }
+
+        try {
+            gameLogic.anlegen(frog, x, y);
+        } catch (Exception e) {
+            System.out.println("Anlegen action failed: " + e.getMessage());
+        }
+
+        try {
+            gameLogic.nachzeihen(this.getPlayerColor());
+        } catch (Exception e) {
+            System.out.println("Nachziehen action failed: " + e.getMessage());
+        }
+    }
 }
