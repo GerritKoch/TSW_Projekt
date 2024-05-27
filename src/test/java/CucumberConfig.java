@@ -7,6 +7,6 @@ import org.junit.runner.RunWith;
     plugin = {"pretty", "html:build/target/cucumber-report.html"},
     features = {"src/test/resources"}
 )
-public class BDDTests {
+public class CucumberConfig {
   // This is needed to run the features via gradle/junit
 }

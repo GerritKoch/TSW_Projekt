@@ -1,4 +1,4 @@
-package de.fhkiel.tsw;
+package aof;
 
 public class Bag {
     private int frogs;

@@ -2,7 +2,7 @@ package steps;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.fhkiel.tsw.Gamelogic;
+import aof.Gamelogic;
 import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;

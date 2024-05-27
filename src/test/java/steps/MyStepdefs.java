@@ -1,6 +1,6 @@
 package steps;
 
-import de.fhkiel.tsw.Gamelogic;
+import aof.Gamelogic;
 import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Wenn;

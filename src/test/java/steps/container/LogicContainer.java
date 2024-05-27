@@ -1,6 +1,6 @@
 package steps.container;
 
-import de.fhkiel.tsw.Gamelogic;
+import aof.Gamelogic;
 
 public class LogicContainer {
     public Gamelogic logicUnderTest;

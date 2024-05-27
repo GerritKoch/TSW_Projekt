@@ -1,4 +1,4 @@
-package de.fhkiel.tsw;
+package aof;
 
 import de.fhkiel.tsw.armyoffrogs.Color;
 import de.fhkiel.tsw.armyoffrogs.Game;
