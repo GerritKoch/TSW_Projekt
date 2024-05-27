@@ -3,6 +3,8 @@ package aof;
 import de.fhkiel.tsw.armyoffrogs.Color;
 import de.fhkiel.tsw.armyoffrogs.Game;
 import de.fhkiel.tsw.armyoffrogs.Position;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -47,7 +49,7 @@ public class Gamelogic implements Game {
 
     @Override
     public List<Color> getFrogsInHand(Color player) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -57,12 +59,12 @@ public class Gamelogic implements Game {
 
     @Override
     public void clicked(Position position) {
-
+        throw new UnsupportedOperationException("notImplemented() cannot be performed because ...");
     }
 
     @Override
     public void selectedFrogInHand(Color player, Color frog) {
-
+        // Noncompliant - method is empty
     }
 
     @Override

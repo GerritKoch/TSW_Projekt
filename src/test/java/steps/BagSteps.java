@@ -59,9 +59,5 @@ public class BagSteps {
     }
 
 
-
-/*    @Und("Spieler Blau legt einen Frosch an")
-    public void spielerBlauLegtEinenFroschAn() {
-    }*/
 }
 
