@@ -3,10 +3,8 @@ package de.fhkiel.tsw;
 import de.fhkiel.tsw.armyoffrogs.Color;
 import de.fhkiel.tsw.armyoffrogs.Game;
 import de.fhkiel.tsw.armyoffrogs.Position;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
 
 ///
 public class Gamelogic implements Game {
@@ -20,6 +18,7 @@ public class Gamelogic implements Game {
     private int x;
     private int y;
     private List<Frog> frogsOnBoard = new ArrayList<>();
+    private Set<Position> board;
 
     @Override
     public boolean newGame(int numberOfPlayers) {
@@ -50,7 +49,7 @@ public class Gamelogic implements Game {
         }
 
 
-
+        board = new HashSet<>();
         for(int i = 0; i < numberOfPlayers; ++i){
             players[i] = new Player(colorList.get(i));
         }
@@ -122,7 +121,7 @@ public class Gamelogic implements Game {
 
     @Override
     public Set<Position> getBoard() {
-        return null;
+        return board;
     }
 
     @Override
@@ -227,7 +226,7 @@ public class Gamelogic implements Game {
             frog.setPosition(currentFrogPosition);
             frog.setFrogInGame(true);
             frogsOnBoard.add(frog);
-
+            board.add(frog.getPosition());
 
         }catch (Exception e){
             e.printStackTrace();
@@ -242,11 +241,19 @@ public class Gamelogic implements Game {
     public void bewegen(Frog frog, int x, int y) {
 
         try{
-
-            Color borderColor = Color.None;
             if(!frog.isFrogInGame()){
                 return;
             }
+
+            for (Position pos : board){
+                if(pos.x() == frog.getPosition().x() && pos.y() == frog.getPosition().y()){
+                    board.remove(pos);
+                    break;
+                }
+            }
+            frog.setPosition(null);
+            Color borderColor = Color.None;
+
             for(Frog frog1 : frogsOnBoard){
                 if(frog1.getPosition().x() == x && frog1.getPosition().y() == y){
                     frog1.setPosition(null);
