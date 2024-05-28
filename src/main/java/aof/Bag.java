@@ -1,23 +1,38 @@
 package aof;
 
+import de.fhkiel.tsw.armyoffrogs.Color;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class Bag {
-    private int frogs;
+    private List<Color> frogs;
 
     public Bag(){
-        this(40);
+
+        this(new Color[]{Color.Red, Color.Green, Color.Blue, Color.White});
     }
 
-    public Bag(int frogs) {
-        this.frogs = frogs;
+    public Bag(Color[] players) {
+        List<Color> newFrogList = new ArrayList<>();
+        for(Color player : players){
+            for(int i = 0; i < 10; ++i){
+                newFrogList.add(player);
+            }
+            frogs = newFrogList;
+        }
     }
 
     public int getFrogs() {
-        return frogs;
+        return frogs.size();
     }
 
-    public void takeFrog() {
-        if(frogs > 0) {
-            frogs = frogs - 1;
+    public Color takeFrog() {
+        if(!frogs.isEmpty()) {
+            return frogs.remove(new Random().nextInt(frogs.size()));
+        } else {
+            return Color.None;
         }
     }
 }

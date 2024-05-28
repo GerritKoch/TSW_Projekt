@@ -10,36 +10,30 @@ import java.util.Set;
 
 public class Gamelogic implements Game {
 
-    private Color[] players;
-    private Bag gameBag;
+    private Color[] player;
+
     @Override
     public boolean newGame(int numberOfPlayers) {
+        if(numberOfPlayers >= 2 && numberOfPlayers <= 4){
+            player = new Color[numberOfPlayers];
 
-        if(numberOfPlayers < 2 || numberOfPlayers > 4)
+            Color[] colorOrder = {Color.Red, Color.Green, Color.Blue, Color.White};
+            for(int i = 0; i < numberOfPlayers; ++i){
+                player[i] = colorOrder[i];
+            }
+
+            startGame(numberOfPlayers);
+
+            return true;
+        } else {
+            player = new Color[0];
             return false;
-
-        players = new Color[numberOfPlayers];
-
-        Color color[] = {Color.Red, Color.Blue, Color.Green, Color.Black, Color.None,Color.White,Color.Black};
-
-        gameBag = new Bag(numberOfPlayers*10);
-
-        for(int i = 0; i < numberOfPlayers; ++i){
-            players[i] = color[i];
         }
-        startGame(numberOfPlayers);
-        return true;
     }
 
     @Override
     public Color[] players() {
-
-
-        return this.players;
-    }
-
-    public int numberOfPlayers() {
-        return players.length;
+        return player;
     }
 
     @Override
@@ -49,7 +43,7 @@ public class Gamelogic implements Game {
 
     @Override
     public List<Color> getFrogsInHand(Color player) {
-        return Collections.emptyList();
+        return null;
     }
 
     @Override
@@ -59,20 +53,16 @@ public class Gamelogic implements Game {
 
     @Override
     public void clicked(Position position) {
-        throw new UnsupportedOperationException("notImplemented() cannot be performed because ...");
+
     }
 
     @Override
     public void selectedFrogInHand(Color player, Color frog) {
-        // Noncompliant - method is empty
+
     }
 
     @Override
     public Color winner() {
-
-        Color currentplayers[]=players();
-
-
         return null;
     }
 
@@ -83,8 +73,6 @@ public class Gamelogic implements Game {
 
     @Override
     public boolean load(String filename) {
-
-
         return false;
     }
 
@@ -95,8 +83,8 @@ public class Gamelogic implements Game {
         return bag.getFrogs();
     }
 
-    public void startGame(int spieler) {
-        bag = new Bag(spieler*10);
+    private void startGame(int spieler) {
+        bag = new Bag(players());
         for (int i = 0; i < 2*spieler; ++i){
             bag.takeFrog();
         }
@@ -105,4 +93,5 @@ public class Gamelogic implements Game {
     public void takeFrogFromBag() {
         bag.takeFrog();
     }
+
 }
