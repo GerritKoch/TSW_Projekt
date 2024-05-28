@@ -4,12 +4,15 @@ import de.fhkiel.tsw.armyoffrogs.Color;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Player {
 
     private Color playerColor;
     private List<Frog> myFrogs;
     private List<Frog> frogsInHand;
+    private Gamelogic currentGame;
+    public boolean isMyTurn;
     public Player (Color inputColor){
 
         myFrogs = new ArrayList<>();
@@ -20,6 +23,27 @@ public class Player {
             myFrogs.add(new Frog(inputColor));
         }
     }
+
+    private enum Actions {
+        BEWEGEN,
+        ANLEGEN,
+        NACHZIEHEN
+    }
+
+//    private Map<Actions, Runnable> actions = Map.of(
+//        Actions.BEWEGEN, () -> {
+//            currentGame.bewegen(null, 0, 0);
+//            System.out.println("Bewegen action failed: ");
+//        },
+//        Actions.ANLEGEN, () -> {
+//            currentGame.anlegen(null, 0, 0);
+//            System.out.println("Anlegen action failed: ");
+//        },
+//        Actions.NACHZIEHEN, () -> {
+//            currentGame.nachzeihen(this.getPlayerColor());
+//            System.out.println("Nachziehen action failed: ");
+//        }
+//    );
 
     public Color getPlayerColor() {
         return playerColor;
@@ -64,5 +88,28 @@ public class Player {
         } catch (Exception e) {
             System.out.println("Nachziehen action failed: " + e.getMessage());
         }
+
+//        Color[] players = gameLogic.players();
+//        for (Color player : players) {
+//            if (player == this.getPlayerColor()) {
+//                this.isMyTurn = false;
+//                //I want to change the isMyTurn to true for the next playe
+//        }
+
+            Player[] players = gameLogic.getPlayers();
+            for (int i = 0; i < players.length; i++) {
+                if (players[i].getPlayerColor() == this.getPlayerColor()) {
+                    this.isMyTurn = false;
+                    // Set isMyTurn to true for the next player
+                    if (i + 1 < players.length) {
+                        players[i + 1].isMyTurn = true;
+                    } else {
+                        // If current player is the last one, set isMyTurn to true for the first player
+                        players[0].isMyTurn = true;
+                    }
+                    break;
+                }
+            }
+
     }
 }
