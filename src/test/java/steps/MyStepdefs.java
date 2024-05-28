@@ -2,11 +2,14 @@ package steps;
 
 import de.fhkiel.tsw.Gamelogic;
 import de.fhkiel.tsw.armyoffrogs.Color;
+import de.fhkiel.tsw.armyoffrogs.Position;
 import io.cucumber.java.de.Angenommen;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import steps.container.LogicContainer;
+
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +29,8 @@ public class MyStepdefs {
 
     private Color playerColor;
     private Color frogColor;
-
+    private Set<Position> currentboard;
+    private Position samplePosition;
 
 
     //Testfall 2
@@ -228,17 +232,41 @@ public class MyStepdefs {
 
     @Angenommen("Es gibt mindestens ein Spielstein auf dem Spielfeld")
     public void esGibtMindestensEinSpielsteinAufDemSpielfeld() {
+        currentboard = container.logicUnderTest.getBoard();
+        assertThat(currentboard).isNotEmpty();
     }
 
     @Und("eine Position hat kein Nachbarn")
     public void einePositionHatKeinNachbarn() {
+        // Write code here that turns the phrase above into concrete actions
+        //Position position = new Position(0, 0);
+        samplePosition = currentboard.iterator().next();
+
     }
 
     @Wenn("ein Stein auf diese Position angelegt")
     public void einSteinAufDiesePositionAngelegt() {
+        // Write code here that turns the phrase above into concrete actions
+        //container.logicUnderTest.anlegen(samplePosition, Color.Red);
     }
 
     @Dann("wird das Anlegen rückgängig gemacht")
     public void wirdDasAnlegenRuckgangigGemacht() {
+        // Write code here that turns the phrase above into concrete actions
+        //assertThat(container.logicUnderTest.getBoard()).doesNotContain(samplePosition);
+    }
+
+    @Angenommen("es sind <Züge> Züge durchgeführt worden")
+    public void esSindZugeZugeDurchgefuhrtWorden() {
+        
+    }
+
+    @Und("Gabriel der dritte Spieler ist")
+    public void gabrielDerDritteSpielerIst() {
+        
+    }
+
+    @Dann("gibt es mindestens ein Stein der ziehenden Farbe auf dem Feld")
+    public void gibtEsMindestensEinSteinDerZiehendenFarbeAufDemFeld() {
     }
 }
