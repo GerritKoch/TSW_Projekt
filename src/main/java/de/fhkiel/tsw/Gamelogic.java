@@ -222,6 +222,12 @@ public class Gamelogic implements Game {
 
         try{
 
+            for (Position pos : board){
+                if(pos.x() == frog.getPosition().x() && pos.y() == frog.getPosition().y()){
+                    throw new Exception("Frog already on board");
+                }
+            }
+
             Position currentFrogPosition = new Position(frog.getFrogColor(),x,y,Color.None);
             frog.setPosition(currentFrogPosition);
             frog.setFrogInGame(true);
