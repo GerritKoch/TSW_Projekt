@@ -20,6 +20,12 @@ public class Gamelogic implements Game {
     private List<Frog> frogsOnBoard = new ArrayList<>();
     private Set<Position> board;
     private Color selectedFrog;
+    private GamePhase currentGamePhase;
+
+    private enum GamePhase {
+        ANLEGEN,
+        NACHZIEHEN
+    }
 
     @Override
     public boolean newGame(int numberOfPlayers) {
