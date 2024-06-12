@@ -104,7 +104,7 @@ public class Gamelogic implements Game {
 
     @Override
     public String getInfo() {
-        return null;
+        return "Infooooo";
     }
 
     @Override
@@ -122,6 +122,12 @@ public class Gamelogic implements Game {
 
     @Override
     public Set<Position> getBoard() {
+
+        if(board == null)
+        {
+            board = new HashSet<>();
+            return board;
+        }
         return board;
     }
 
@@ -144,6 +150,11 @@ public class Gamelogic implements Game {
         }*/
 
         //board.add()
+
+        //board.add( )
+        board.add(new Position(selectedFrog, position.x(), position.x(), position.border()));
+        selectedFrog = null;
+
     }
 
     @Override
