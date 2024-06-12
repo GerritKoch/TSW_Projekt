@@ -19,6 +19,7 @@ public class Gamelogic implements Game {
     private int y;
     private List<Frog> frogsOnBoard = new ArrayList<>();
     private Set<Position> board;
+    private Color selectedFrog;
 
     @Override
     public boolean newGame(int numberOfPlayers) {
@@ -126,16 +127,78 @@ public class Gamelogic implements Game {
 
     @Override
     public void clicked(Position position) {
+        /*if (currentPhase == GamePhase.ANLEGEN && selectedFrog != null) {
+            if (isPositionOccupied(position)) {
+                System.out.println("Position " + position + " ist bereits besetzt.");
+            } else {
+                board.add(new Position(selectedFrog, position.x(), position.y(), position.border()));
+                selectedFrog = null;
+                System.out.println("clicked(" + position + ") ausgeführt.");
+                // Automatically proceed to the next phase (Nachziehen)
+                currentPhase = GamePhase.NACHZIEHEN;
+                drawFrog();
+                endTurn();
+            }
+        } else {
+            System.out.println("Invalid action for current phase or no frog selected.");
+        }*/
 
+        //board.add()
     }
 
     @Override
     public void selectedFrogInHand(Color player, Color frog) {
 
+    for (Player play : players) {
+        if (play.getPlayerColor() == player) {
+            //play.setFrogsInHand(new Frog(frog));
+            selectedFrog = frog;
+            play.setFrogsInHand(new Frog(frog));
+            play.getFrogs().removeIf(frog1 -> frog1.getFrogColor() == frog);
+        }
+    }
+
     }
 
     @Override
     public Color winner() {
+
+        boolean testWinner = false;
+        List<Color> currentPlayerColors = new ArrayList<>();
+        List<Position> positionsOfSinglePlayer = new ArrayList<>();
+        for(Player play : players){
+            currentPlayerColors.add(play.getPlayerColor());
+        }
+        for (Color playerColor: currentPlayerColors){
+
+            for(Position pos : board){
+                if(pos.frog() == playerColor){
+                    positionsOfSinglePlayer.add(pos);
+                }
+            }
+            if(positionsOfSinglePlayer.size() >= 7){
+
+                for(int i= 0; i < positionsOfSinglePlayer.size() - 1; i++){
+
+                    int q1 = positionsOfSinglePlayer.get(i).x();
+                    int r1 = positionsOfSinglePlayer.get(i).y();
+                    int q2 = positionsOfSinglePlayer.get(i+1).x();
+                    int r2 = positionsOfSinglePlayer.get(i+1).y();
+                    if(areNeighbours(q1,r1,q2,r2)){
+                        testWinner = true;
+                    }
+                    else{
+                        testWinner = false;
+                    }
+                }
+
+                if(testWinner){
+                    return playerColor;
+                }
+
+            }
+
+        }
 
 
         return null;
@@ -283,6 +346,16 @@ public class Gamelogic implements Game {
 
     public void nachzeihen(Color color) {
         takeFrogFromBag();
+    }
+
+    public boolean areNeighbours(int q1,int r1, int q2, int r2) {
+
+        return (q2 == q1 + 1 && r2 == r1) || // Right neighbor
+                (q2 == q1 - 1 && r2 == r1) || // Left neighbor
+                (q2 == q1 && r2 == r1 + 1) || // Upper-right neighbor
+                (q2 == q1 && r2 == r1 - 1) || // Lower-left neighbor
+                (q2 == q1 + 1 && r2 == r1 - 1) || // Upper-left neighbor
+                (q2 == q1 - 1 && r2 == r1 + 1); // Lower-right neighbor
     }
 
 }

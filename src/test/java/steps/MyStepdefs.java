@@ -232,6 +232,7 @@ public class MyStepdefs {
 
     @Angenommen("Es gibt mindestens ein Spielstein auf dem Spielfeld")
     public void esGibtMindestensEinSpielsteinAufDemSpielfeld() {
+
         currentboard = container.logicUnderTest.getBoard();
         assertThat(currentboard).isNotEmpty();
     }

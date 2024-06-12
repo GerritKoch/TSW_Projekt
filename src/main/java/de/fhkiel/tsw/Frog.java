@@ -3,6 +3,8 @@ package de.fhkiel.tsw;
 import de.fhkiel.tsw.armyoffrogs.Color;
 import de.fhkiel.tsw.armyoffrogs.Position;
 
+import java.util.List;
+
 public class Frog {
 
 
@@ -10,6 +12,20 @@ public class Frog {
     private boolean frogInGame;
     private boolean frogInHand = false;
     private Position position;
+
+    public List<Frog> getMyNeighbors() {
+        return myNeighbors;
+    }
+
+    public void setMyNeighbors(List<Frog> myNeighbors) {
+        this.myNeighbors = myNeighbors;
+    }
+
+    public void addNeighbor(Frog neighbor){
+        myNeighbors.add(neighbor);
+    }
+
+    private List<Frog> myNeighbors;
 
 
     public Frog (){
