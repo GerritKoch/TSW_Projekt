@@ -10,6 +10,9 @@ import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import steps.container.LogicContainer;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,11 +30,16 @@ public class MyStepdefs {
     private int numofFrogsInHand;
 
     private boolean gameStarted;
+    private boolean testResult;
 
     private Color playerColor;
     private Color frogColor;
     private Set<Position> currentboard;
     private Position samplePosition;
+    private Player currentPlayer;
+    private Player samplePlayer;
+    private Gamelogic.GamePhase currentPhase;
+    private int gameRound;
 
 
     //Testfall 2
@@ -238,41 +246,229 @@ public class MyStepdefs {
     @Angenommen("Es gibt mindestens ein Spielstein auf dem Spielfeld")
     public void esGibtMindestensEinSpielsteinAufDemSpielfeld() {
 
-        currentboard = container.logicUnderTest.getBoard();
-        assertThat(currentboard).isNotEmpty();
+        einSpielLauft();
+        einSpielHatEinSteinVonDerZiehendenFarbeAngelegt();
     }
 
     @Und("eine Position hat kein Nachbarn")
     public void einePositionHatKeinNachbarn() {
         // Write code here that turns the phrase above into concrete actions
         //Position position = new Position(0, 0);
-        samplePosition = currentboard.iterator().next();
+        samplePosition = new Position(currentPlayer.getPlayerColor(), 2, 2, Color.None);
 
     }
 
     @Wenn("ein Stein auf diese Position angelegt")
     public void einSteinAufDiesePositionAngelegt() {
-        // Write code here that turns the phrase above into concrete actions
-        //container.logicUnderTest.anlegen(samplePosition, Color.Red);
+
+        container.logicUnderTest.anlegen(samplePosition);
     }
 
     @Dann("wird das Anlegen rückgängig gemacht")
     public void wirdDasAnlegenRuckgangigGemacht() {
         // Write code here that turns the phrase above into concrete actions
-        //assertThat(container.logicUnderTest.getBoard()).doesNotContain(samplePosition);
+
+        assertThat(container.logicUnderTest.getBoard()).doesNotContain(samplePosition);
     }
 
-    @Angenommen("es sind <Züge> Züge durchgeführt worden")
-    public void esSindZugeZugeDurchgefuhrtWorden() {
-        
-    }
+
 
     @Und("Gabriel der dritte Spieler ist")
     public void gabrielDerDritteSpielerIst() {
+
+        samplePlayer = container.logicUnderTest.getPlayers()[2];
         
     }
 
     @Dann("gibt es mindestens ein Stein der ziehenden Farbe auf dem Feld")
     public void gibtEsMindestensEinSteinDerZiehendenFarbeAufDemFeld() {
+        assertThat(currentboard).isNotEmpty();
+    }
+
+    @Angenommen("ein Spiel läuft")
+    public void einSpielLauft() {
+        dasSpielIstMitSpielernGestartet(2);
+
+
+    }
+
+    @Und("ein Spieler hat ein Stein von der ziehenden Farbe angelegt")
+    public void einSpielHatEinSteinVonDerZiehendenFarbeAngelegt() {
+
+        currentPlayer = container.logicUnderTest.getCurrentPlayer();
+        container.logicUnderTest.anlegen(new Position(currentPlayer.getPlayerColor(),0, 0, Color.None));
+
+    }
+
+    @Wenn("Der GUI überprüft, ob ein Stein der ziehenden Farbe angelegt ist.")
+    public void derGUIUberpruftObEinSteinDerZiehendenFarbeAngelegtIst() {
+        currentboard = container.logicUnderTest.getBoard();
+    }
+
+    @Und("es noch kein Stein angelegt wurde")
+    public void esNochKeinSteinAngelegtWurde() {
+        System.out.println("Kein Stein angelegt");
+    }
+
+    @Dann("gibt es kein Stein der ziehenden Farbe auf dem Feld")
+    public void gibtEsKeinSteinDerZiehendenFarbeAufDemFeld() {
+        assertThat(currentboard).isEmpty();
+    }
+
+    @Angenommen("es sind im Spiel sechs Züge durchgeführt worden")
+    public void esSindImSpielSechsZugeDurchgefuhrtWorden() {
+        einSpielLauft();
+    }
+
+    @Wenn("ein Stein in der Mitte gesetzt wird")
+    public void einSteinInDerMitteGesetztWird() {
+        currentPlayer = container.logicUnderTest.getCurrentPlayer();
+        samplePosition = new Position(currentPlayer.getPlayerColor(), 0, 0, Color.None);
+        container.logicUnderTest.anlegen(samplePosition);
+    }
+
+    @Und("funf Steine um ihn herum gesetzt werde")
+    public void funfSteineUmIhnHerumGesetztWerde() {
+        container.logicUnderTest.anlegen(new Position(currentPlayer.getPlayerColor(), 1, 0, Color.None));
+        container.logicUnderTest.anlegen(new Position(currentPlayer.getPlayerColor(), -1, 0, Color.None));
+        container.logicUnderTest.anlegen(new Position(currentPlayer.getPlayerColor(), 0, 1, Color.None));
+        container.logicUnderTest.anlegen(new Position(currentPlayer.getPlayerColor(), 0, -1, Color.None));
+        container.logicUnderTest.anlegen(new Position(currentPlayer.getPlayerColor(), -1, 1, Color.None));
+    }
+
+    @Dann("hat der  Stein  {int} Verbindungen")
+    public void hatDerSteinVerbindungen(int arg0) {
+
+       currentboard = container.logicUnderTest.getBoard();
+       List<Position> boardPositions = new ArrayList<>(currentboard);
+       Set<Position> positionSet = new HashSet<>();
+
+       int bfs = container.logicUnderTest.bfs(samplePosition,boardPositions,positionSet);
+       assertThat(arg0+1).isEqualTo(bfs);
+
+    }
+
+    @Und("der erste Spieler ist mit einem Zug fertig")
+    public void derErsteSpielerIstMitEinemZugFertig() {
+        currentPlayer = container.logicUnderTest.getCurrentPlayer();
+        container.logicUnderTest.anlegen(new Position(currentPlayer.getPlayerColor(), 0, 0, Color.None));
+        container.logicUnderTest.endTurn();
+    }
+
+    @Wenn("es gefragt wird, ob der dritte Spieler am Zug ist")
+    public void esGefragtWirdObDerDritteSpielerAmZugIst() {
+
+        testResult = currentPlayer == samplePlayer;
+    }
+
+    @Dann("der dritter Spieler ist nicht am Zug")
+    public void derDritterSpielerIstNichtAmZug() {
+        assertThat(testResult).isFalse();
+    }
+
+    @Und("Peter ist an der Reihe")
+    public void peterIstAnDerReihe() {
+        currentPlayer = container.logicUnderTest.getCurrentPlayer();
+    }
+
+    @Wenn("Peter den ersten Zug macht")
+    public void peterDenErstenZugMacht() {
+        container.logicUnderTest.anlegen(new Position(currentPlayer.getPlayerColor(), 0, 0, Color.None));
+    }
+
+    @Dann("wird der Stein auf das Spielfeld gelegt")
+    public void wirdDerSteinAufDasSpielfeldGelegt() {
+
+        assertThat(container.logicUnderTest.getBoard()).isNotEmpty();
+    }
+
+    @Angenommen("Peter hat einen Frosch angelegt")
+    public void peterHatEinenFroschAngelegt() {
+
+        esSindImSpielSechsZugeDurchgefuhrtWorden();
+        einSteinInDerMitteGesetztWird();
+        funfSteineUmIhnHerumGesetztWerde();
+
+        currentPlayer = container.logicUnderTest.getCurrentPlayer();
+        samplePosition = new Position(currentPlayer.getPlayerColor(), 1, 1, Color.None);
+        container.logicUnderTest.anlegen(samplePosition);
+
+
+    }
+
+    @Wenn("die Position des Froschs abgefragt wird")
+    public void diePositionDesFroschsAbgefragtWird() {
+        // Write code here that turns the phrase above into concrete actions
+        currentboard = container.logicUnderTest.getBoard();
+        samplePosition = currentboard.iterator().next();
+    }
+
+    @Dann("hat die Position mehr als null angrenzende Frösche")
+    public void hatDiePositionMehrAlsNullAngrenzendeFrosche() {
+
+        List<Position> boardPositions = new ArrayList<>(currentboard);
+        Set<Position> positionSet = new HashSet<>();
+        int bfs = container.logicUnderTest.bfs(samplePosition,boardPositions,positionSet);
+        assertThat(bfs).isGreaterThan(0);
+    }
+
+    @Und("das Spiel wurde mit zwei Spielern gestartet")
+    public void dasSpielWurdeMitZweiSpielernGestartet() {
+        dasSpielIstMitSpielernGestartet(2);
+    }
+
+    @Und("es sind null Züge durchgeführt worden")
+    public void esSindNullZugeDurchgefuhrtWorden() {
+
+        assertThat(container.logicUnderTest.getGameRound()).isZero();
+
+    }
+
+    @Wenn("die Spielphase abgefragt wird")
+    public void dieSpielphaseAbgefragtWird() {
+
+        currentPhase = container.logicUnderTest.getCurrentGamePhase();
+
+    }
+
+    @Dann("ist die Spielphase Anlegephase")
+    public void istDieSpielphaseAnlegephase() {
+
+            assertThat(currentPhase).isEqualTo(Gamelogic.GamePhase.ANLEGEN);
+    }
+
+    @Und("der erste Spieler hat einen Stein angelegt")
+    public void derErsteSpielerHatEinenSteinAngelegt() {
+        currentPlayer = container.logicUnderTest.getCurrentPlayer();
+        container.logicUnderTest.anlegen(new Position(currentPlayer.getPlayerColor(), 0, 0, Color.None));
+    }
+
+    @Dann("ist die Spielphase Nachziehphase")
+    public void istDieSpielphaseNachziehphase() {
+
+        assertThat(currentPhase).isEqualTo(Gamelogic.GamePhase.NACHZIEHEN);
+    }
+
+    @Angenommen("das erste Stein wurde gelegt")
+    public void dasErsteSteinWurdeGelegt() {
+
+       dasSpielIstMitSpielernGestartet(2);
+       derErsteSpielerHatEinenSteinAngelegt();
+
+
+    }
+
+    @Wenn("die Reihefolge der Phase durchgeführt wird")
+    public void dieReihefolgeDerPhaseDurchgefuhrtWird() {
+        container.logicUnderTest.endTurn();
+    }
+
+    @Dann("ist die Reihenfolge Nachziehen, Bewegen, Anlegen")
+    public void istDieReihenfolgeNachziehenBewegenAnlegen() {
+        assertThat(container.logicUnderTest.getCurrentGamePhase()).isEqualTo(Gamelogic.GamePhase.NACHZIEHEN);
+        container.logicUnderTest.nachziehen();
+        assertThat(container.logicUnderTest.getCurrentGamePhase()).isEqualTo(Gamelogic.GamePhase.BEWEGEN);
+        container.logicUnderTest.bewegen();
+        assertThat(container.logicUnderTest.getCurrentGamePhase()).isEqualTo(Gamelogic.GamePhase.ANLEGEN);
     }
 }

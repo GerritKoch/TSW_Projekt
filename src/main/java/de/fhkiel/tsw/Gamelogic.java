@@ -20,14 +20,29 @@ public class Gamelogic implements Game {
     private final List<Frog> frogsOnBoard;
     private Set<Position> board;
     private Color selectedFrog;
+
+    public GamePhase getCurrentGamePhase() {
+        return currentGamePhase;
+    }
+
     private GamePhase currentGamePhase;
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
     private Player currentPlayer;
     private Map<Player,List<Color>> frogsInHandMap;
 
+    public int getGameRound() {
+        return gameRound ;
+    }
 
-    private enum GamePhase {
+
+    public enum GamePhase {
         ANLEGEN,
-        NACHZIEHEN
+        NACHZIEHEN,
+        BEWEGEN
     }
 
     public Gamelogic(){
@@ -205,7 +220,8 @@ public class Gamelogic implements Game {
         if (selectedFrog != null && currentGamePhase == GamePhase.ANLEGEN && spielLaueft) {
             Position newPos = new Position(selectedFrog, position.x(), position.y(), position.border());
             if(anlegen(newPos)){
-                takeFrogFromBag(currentPlayer);
+                nachziehen();
+                bewegen();;
                 selectedFrog = null;
                 endTurn();
 
@@ -215,15 +231,29 @@ public class Gamelogic implements Game {
 
     }
 
-    private void endTurn() {
+    public void nachziehen(){
+        if(currentGamePhase == GamePhase.NACHZIEHEN){
+            takeFrogFromBag(currentPlayer);
+           currentGamePhase = GamePhase.BEWEGEN;
+        }
+    }
+
+    public void bewegen(){
+        if(currentGamePhase == GamePhase.BEWEGEN){
+            currentGamePhase = GamePhase.ANLEGEN;
+        }
+    }
+
+
+    public void endTurn() {
         // Automatically proceed to the next player
+
         int currentIndex = Arrays.asList(players).indexOf(currentPlayer);
         currentPlayer = players[(currentIndex + 1) % players.length];
         if (winner() != Color.None) {
             System.out.println("Game ended. Winner: " + winner());
             spielLaueft = false;
         }
-        currentGamePhase = GamePhase.ANLEGEN;
         gameRound++;
         System.out.println("Turn" + gameRound+" ended. Next player: " + currentPlayer);
     }
@@ -318,7 +348,7 @@ public class Gamelogic implements Game {
         }
     }
 
-    private int bfs(Position start, List<Position> positionsOfSinglePlayer, Set<Position> visited) {
+    public int bfs(Position start, List<Position> positionsOfSinglePlayer, Set<Position> visited) {
         Queue<Position> queue = new LinkedList<>();
         queue.add(start);
         visited.add(start);

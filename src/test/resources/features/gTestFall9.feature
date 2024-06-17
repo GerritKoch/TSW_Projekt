@@ -4,6 +4,7 @@ Funktionalität: (AoF-Al-109) Die GUI muss die Anzahl der Verbindungen eines jed
 
   Szenario: Peter möchte wie viele Verbindung hat ein Stein
   Testfall:
-    Angenommen es sind <Züge> Züge durchgeführt worden
-    Wenn die Anzahl der Verbindungen von einem <beliebigem Stein> abgefragt wird
-    Dann hat der <beliebeiger Stein>  <Anzahl der Verbindungen> Verbindungen
+    Angenommen es sind im Spiel sechs Züge durchgeführt worden
+    Wenn ein Stein in der Mitte gesetzt wird
+    Und funf Steine um ihn herum gesetzt werde
+    Dann hat der  Stein  5 Verbindungen
