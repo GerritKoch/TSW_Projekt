@@ -6,6 +6,8 @@ import de.fhkiel.tsw.armyoffrogs.Position;
 
 import java.util.*;
 
+import static java.lang.Math.abs;
+
 ///
 public class Gamelogic implements Game {
     private Player[] players;
@@ -112,20 +114,27 @@ public class Gamelogic implements Game {
     @Override
     public Color[] players() {
 
-        List<Color> test = new ArrayList<>();
-        for(Player playCol : this.players){
-            test.add(playCol.getPlayerColor());
-        }
 
-        playersColor = new Color[test.size()];
 
-        int i = 0;
-        for(Color oneColor: test){
-            playersColor[i]= oneColor;
-            i++;
-        }
 
-        return playersColor;
+        playersColor = new Color[players.length];
+        if (spielLaueft){
+
+            List<Color> test = new ArrayList<>();
+            for(Player playCol : this.players){
+                test.add(playCol.getPlayerColor());
+            }
+            int i = 0;
+            for(Color oneColor: test){
+                playersColor[i]= oneColor;
+                i++;
+            }
+
+            return playersColor;
+        }else
+
+            return new Color[0];
+
     }
 
     public int numberOfPlayers() {
@@ -142,7 +151,7 @@ public class Gamelogic implements Game {
 
     @Override
     public String getInfo() {
-        return "Infooooo";
+        return "Das Spiel ist mit " + numOfPlayers + " Spielern gestartet. Aktueller Spieler: " + currentPlayer.getPlayerColor() + ", Phase: " + currentGamePhase + ". Turn: " + turncount + ".";
     }
 
     @Override
@@ -193,18 +202,11 @@ public class Gamelogic implements Game {
 
         //board.add( )
         if (selectedFrog != null && currentGamePhase == GamePhase.ANLEGEN) {
-
-            if (isPositionOccupied(position)) {
-                System.out.println("Position " + position + " ist bereits besetzt.");
-            } else if (turncount > 0 && position.border() == Color.None) {
-                System.out.println("This position has no border.");
-            }
-            else {
-            board.add(new Position(selectedFrog, position.x(), position.y(), position.border()));
-            currentGamePhase = GamePhase.NACHZIEHEN;
-            takeFrogFromBag(currentPlayer);
-            selectedFrog = null;
-            endTurn();
+            Position newPos = new Position(selectedFrog, position.x(), position.y(), position.border());
+            if(anlegen(newPos)){
+                takeFrogFromBag(currentPlayer);
+                selectedFrog = null;
+                endTurn();
 
             }
         }
@@ -223,9 +225,11 @@ public class Gamelogic implements Game {
     private boolean isPositionOccupied(Position position) {
         for (Position pos : board) {
             if (pos.x() == position.x() && pos.y() == position.y()) {
+                System.out.println("Position " + position + " ist bereits besetzt.");
                 return true;
             }
         }
+
         return false;
     }
     @Override
@@ -254,7 +258,7 @@ public class Gamelogic implements Game {
         }
         for (Color playerColor: currentPlayerColors){
 
-            for(Position pos : board){
+            for(Position pos : getBoard()){
                 if(pos.frog() == playerColor){
                     positionsOfSinglePlayer.add(pos);
                 }
@@ -299,7 +303,6 @@ public class Gamelogic implements Game {
         return false;
     }
 
-    //private Bag bag = new Bag();
 
     @Override
     public int frogsInBag() {
@@ -318,21 +321,25 @@ public class Gamelogic implements Game {
     }
 
     public void takeFrogFromBag() {
-        for(Player player : players){
+        if(gameBag.getNumoffrogs() > 0){
+            for(Player player : players){
                 if(player.getFrogsInHand().size() < 2)  {
                     Frog takenFrog = gameBag.takeFrog();
                     player.setMyFrogs(takenFrog);
                     player.setFrogsInHand(takenFrog);
                 }
-
+            }
         }
     }
 
     public void takeFrogFromBag(Player player) {
-        if(player.getFrogsInHand().size() < 2)  {
-            Frog takenFrog = gameBag.takeFrog();
-            player.setMyFrogs(takenFrog);
-            player.setFrogsInHand(takenFrog);
+
+        if(gameBag.getNumoffrogs() > 0){
+            if(player.getFrogsInHand().size() < 2)  {
+                Frog takenFrog = gameBag.takeFrog();
+                player.setMyFrogs(takenFrog);
+                player.setFrogsInHand(takenFrog);
+            }
         }
     }
 
@@ -358,30 +365,22 @@ public class Gamelogic implements Game {
         return players;
     }
 
-    public void anlegen(Frog frog,int x, int y) {
+    public boolean anlegen(Position pos) {
 
-        try{
-
-            for (Position pos : board){
-                if(pos.x() == frog.getPosition().x() && pos.y() == frog.getPosition().y()){
-                    throw new Exception("Frog already on board");
-                }
-            }
-
-            Position currentFrogPosition = new Position(frog.getFrogColor(),x,y,Color.None);
-            frog.setPosition(currentFrogPosition);
-            frog.setFrogInGame(true);
-            frogsOnBoard.add(frog);
-            board.add(frog.getPosition());
-
-        }catch (Exception e){
-            e.printStackTrace();
+        if(turncount == 0){
+            board.add(pos);
+            System.out.println("Erstes Anlegen ist erfolgreich.");
+            currentGamePhase = GamePhase.NACHZIEHEN;
+            return true;
         }
+        if( !isPositionOccupied(pos) && hasNeighbour(pos)){
+               board.add(pos);
+                System.out.println("Anlegen erfolgreich.");
+                currentGamePhase = GamePhase.NACHZIEHEN;
+                return true;
+           }
 
-       Position currentFrogPosition = new Position(frog.getFrogColor(),x,y,Color.None);
-       frog.setPosition(currentFrogPosition);
-        frog.setFrogInGame(true);
-
+        return false;
     }
 
     public void bewegen(Frog frog, int x, int y) {
@@ -427,12 +426,34 @@ public class Gamelogic implements Game {
 
     public boolean areNeighbours(int q1,int r1, int q2, int r2) {
 
-        return (q2 == q1 + 1 && r2 == r1) || // Right neighbor
-                (q2 == q1 - 1 && r2 == r1) || // Left neighbor
-                (q2 == q1 && r2 == r1 + 1) || // Upper-right neighbor
-                (q2 == q1 && r2 == r1 - 1) || // Lower-left neighbor
-                (q2 == q1 + 1 && r2 == r1 - 1) || // Upper-left neighbor
-                (q2 == q1 - 1 && r2 == r1 + 1); // Lower-right neighbor
+        if(r1 == 0 || (abs(r1) % 2) == 0){
+
+            return (q2 == q1 + 1 && r2 == r1) || // Right neighbor
+                    (q2 == q1 - 1 && r2 == r1) || // Left neighbor
+                    (q2 == q1 && r2 == r1 - 1) || // Upper-right neighbor
+                    (q2 == q1 && r2 == r1 + 1) || // Lower-right neighbor
+                    (q2 == q1 - 1 && r2 == r1 - 1) || // Upper-left neighbor
+                    (q2 == q1 - 1 && r2 == r1 + 1); // Lower-left neighbor
+
+        } else {
+            return (q2 == q1 + 1 && r2 == r1) || // Right neighbor
+                    (q2 == q1 - 1 && r2 == r1) || // Left neighbor
+                    (q2 == q1 + 1 && r2 == r1 - 1) || // Upper-right neighbor
+                    (q2 == q1 + 1 && r2 == r1 + 1) || // Lower-right neighbor
+                    (q2 == q1  && r2 == r1 - 1) || // Upper-left neighbor
+                    (q2 == q1  && r2 == r1 + 1); // Lower-left neighbor
+        }
+
+
+    }
+
+    public boolean hasNeighbour(Position pos1) {
+        for (Position pos2 : board) {
+            if (areNeighbours(pos1.x(), pos1.y(), pos2.x(), pos2.y())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -83,46 +83,5 @@ public class Player {
     }
 
 
-    public void performActions(Frog frog, int x, int y, Gamelogic gameLogic) {
-        try {
-            gameLogic.bewegen(frog, x, y);
-        } catch (Exception e) {
-            System.out.println("Bewegen action failed: " + e.getMessage());
-        }
 
-        try {
-            gameLogic.anlegen(frog, x, y);
-        } catch (Exception e) {
-            System.out.println("Anlegen action failed: " + e.getMessage());
-        }
-
-        try {
-            gameLogic.nachzeihen(this.getPlayerColor());
-        } catch (Exception e) {
-            System.out.println("Nachziehen action failed: " + e.getMessage());
-        }
-
-//        Color[] players = gameLogic.players();
-//        for (Color player : players) {
-//            if (player == this.getPlayerColor()) {
-//                this.isMyTurn = false;
-//                //I want to change the isMyTurn to true for the next playe
-//        }
-
-            Player[] players = gameLogic.getPlayers();
-            for (int i = 0; i < players.length; i++) {
-                if (players[i].getPlayerColor() == this.getPlayerColor()) {
-                    this.isMyTurn = false;
-                    // Set isMyTurn to true for the next player
-                    if (i + 1 < players.length) {
-                        players[i + 1].isMyTurn = true;
-                    } else {
-                        // If current player is the last one, set isMyTurn to true for the first player
-                        players[0].isMyTurn = true;
-                    }
-                    break;
-                }
-            }
-
-    }
 }
