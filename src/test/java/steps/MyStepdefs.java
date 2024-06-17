@@ -1,6 +1,7 @@
 package steps;
 
 import de.fhkiel.tsw.Gamelogic;
+import de.fhkiel.tsw.Player;
 import de.fhkiel.tsw.armyoffrogs.Color;
 import de.fhkiel.tsw.armyoffrogs.Position;
 import io.cucumber.java.de.Angenommen;
@@ -145,7 +146,8 @@ public class MyStepdefs {
             color = "Schwarz";
         setFrogColor(color);
 
-        numofFrogs = container.logicUnderTest.frogsInBag_withColor(frogColor);
+        numofFrogs = container.logicUnderTest.frogsInBagWithColor(frogColor);
+        numofFrogs += container.logicUnderTest.getFrogInHandMapSize(frogColor);
 
 
     }
@@ -180,7 +182,10 @@ public class MyStepdefs {
     @Dann("sind im Beutel {int} Steine")
     public void sind_im_beutel_steine(Integer int1) {
         // Write code here that turns the phrase above into concrete actions
-        assertThat(container.logicUnderTest.frogsInBag()).isEqualTo(int1);
+
+        int numofFrogs = container.logicUnderTest.frogsInBag();
+        numofFrogs += container.logicUnderTest.getFrogInHandMapSize();
+        assertThat(numofFrogs).isEqualTo(int1);
 
     }
 

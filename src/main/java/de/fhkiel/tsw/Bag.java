@@ -74,13 +74,7 @@ public class Bag {
     }
 
     public List<Frog> getFrogsInBag(Color color) {
-        List<Frog> frogs = new ArrayList<>();
-        for (Frog frog : frogsInBag) {
-            if (frog.getFrogColor() == color) {
-                frogs.add(frog);
-            }
-        }
-        return frogs;
+        return frogsInBag.stream().filter(frog -> frog.getFrogColor() == color).toList();
     }
 
 
