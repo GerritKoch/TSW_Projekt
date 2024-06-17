@@ -6,17 +6,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
+
 public class Player {
 
     private Color playerColor;
     private List<Frog> myFrogs;
-    private List<Frog> frogsInHand;
+    private myFrogList frogsInHand;
     private Gamelogic currentGame;
     public boolean isMyTurn;
     public Player (Color inputColor){
 
         myFrogs = new ArrayList<>();
-        frogsInHand = new ArrayList<>(2);
+        frogsInHand = new myFrogList();
 
         this.playerColor = inputColor;
         for(int i = 0; i < 10; i++){
@@ -73,6 +75,11 @@ public class Player {
     public void setMyFrogs(List<Frog> myFrogs) {
 
         this.myFrogs = myFrogs;
+    }
+
+    public void setMyFrogs(Frog frog) {
+
+        this.myFrogs.add(frog);
     }
 
 

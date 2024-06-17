@@ -9,22 +9,38 @@ import java.util.*;
 ///
 public class Gamelogic implements Game {
     private Player[] players;
+    private Color[] playersColor;
     private List<Player> playerList;
     private Bag gameBag;
     private boolean spielLaueft;
-    private int numOfPlayers = 0;
+    private int numOfPlayers;
     private int gameRound;
-    private boolean frogonBoard = false;
+    private boolean frogonBoard;
     private int x;
     private int y;
-    private List<Frog> frogsOnBoard = new ArrayList<>();
+    private List<Frog> frogsOnBoard;
     private Set<Position> board;
     private Color selectedFrog;
     private GamePhase currentGamePhase;
+    private Player currentPlayer;
+    List<Color> frogsInHand;
+    int turncount;
 
     private enum GamePhase {
         ANLEGEN,
         NACHZIEHEN
+    }
+
+    public Gamelogic(){
+        board = new HashSet<>();
+        frogsOnBoard = new ArrayList<>();
+        numOfPlayers =0;
+        frogonBoard = false;
+        gameBag = new Bag();
+        spielLaueft = false;
+        frogsInHand = new ArrayList<>();
+        players =new Player[4];
+        turncount = 0;
     }
 
     @Override
@@ -34,6 +50,11 @@ public class Gamelogic implements Game {
             spielLaueft = false;
             return false;
         }
+
+        frogsInHand.clear();
+        board.clear();
+        spielLaueft = false;
+
 
         gameRound = 0;
         numOfPlayers = numberOfPlayers;
@@ -56,7 +77,7 @@ public class Gamelogic implements Game {
         }
 
 
-        board = new HashSet<>();
+
         for(int i = 0; i < numberOfPlayers; ++i){
             players[i] = new Player(colorList.get(i));
         }
@@ -72,7 +93,17 @@ public class Gamelogic implements Game {
 //
 //        }
 
+        currentPlayer = players[0];
+        currentGamePhase = GamePhase.ANLEGEN;
+        selectedFrog = null;
+        spielLaueft = true;
         gameBag = new Bag(numberOfPlayers*10,colorList);
+        Collections.shuffle(gameBag.getFrogsInBag());
+
+        for(int i = 0; i < numberOfPlayers; i++){
+            takeFrogFromBag();
+        }
+
        // startGame(numberOfPlayers,gameBag);
         return true;
     }
@@ -86,14 +117,15 @@ public class Gamelogic implements Game {
             test.add(playCol.getPlayerColor());
         }
 
-        Color[] test2 = new Color[test.size()];
+        playersColor = new Color[test.size()];
+
         int i = 0;
         for(Color oneColor: test){
-            test2[i]= oneColor;
+            playersColor[i]= oneColor;
             i++;
         }
 
-        return test2;
+        return playersColor;
     }
 
     public int numberOfPlayers() {
@@ -115,12 +147,14 @@ public class Gamelogic implements Game {
 
     @Override
     public List<Color> getFrogsInHand(Color player) {
-        List<Color> frogsInHand = new ArrayList<>();
+
+        frogsInHand.clear();
         for(Player play : players){
             if(play.getPlayerColor() == player){
                 for(Frog frog : play.getFrogsInHand()){
                     frogsInHand.add(frog.getFrogColor());
                 }
+                break;
             }
         }
         return frogsInHand;
@@ -158,22 +192,54 @@ public class Gamelogic implements Game {
         //board.add()
 
         //board.add( )
-        board.add(new Position(selectedFrog, position.x(), position.x(), position.border()));
-        selectedFrog = null;
+        if (selectedFrog != null && currentGamePhase == GamePhase.ANLEGEN) {
+
+            if (isPositionOccupied(position)) {
+                System.out.println("Position " + position + " ist bereits besetzt.");
+            } else if (turncount > 0 && position.border() == Color.None) {
+                System.out.println("This position has no border.");
+            }
+            else {
+            board.add(new Position(selectedFrog, position.x(), position.y(), position.border()));
+            currentGamePhase = GamePhase.NACHZIEHEN;
+            takeFrogFromBag(currentPlayer);
+            selectedFrog = null;
+            endTurn();
+
+            }
+        }
+
 
     }
 
+    private void endTurn() {
+        // Automatically proceed to the next player
+        int currentIndex = Arrays.asList(players).indexOf(currentPlayer);
+        currentPlayer = players[(currentIndex + 1) % players.length];
+        currentGamePhase = Gamelogic.GamePhase.ANLEGEN;
+        turncount++;
+        System.out.println("Turn" + turncount+" ended. Next player: " + currentPlayer);
+    }
+    private boolean isPositionOccupied(Position position) {
+        for (Position pos : board) {
+            if (pos.x() == position.x() && pos.y() == position.y()) {
+                return true;
+            }
+        }
+        return false;
+    }
     @Override
     public void selectedFrogInHand(Color player, Color frog) {
 
-    for (Player play : players) {
-        if (play.getPlayerColor() == player) {
-            //play.setFrogsInHand(new Frog(frog));
-            selectedFrog = frog;
-            play.setFrogsInHand(new Frog(frog));
-            play.getFrogs().removeIf(frog1 -> frog1.getFrogColor() == frog);
-        }
+    if (currentPlayer.getPlayerColor() == player && currentGamePhase == GamePhase.ANLEGEN) {
+        selectedFrog = frog;
+        frogsInHand.remove(frog);
+        currentPlayer.getFrogsInHand().removeIf(frog1 -> frog1.getFrogColor() == frog);
+        System.out.println("selectedFrogInHand(" + player + ", " + frog + ") ausgeführt.");
+    } else {
+        System.out.println("Invalid frog selection.");
     }
+
 
     }
 
@@ -254,28 +320,22 @@ public class Gamelogic implements Game {
     public void takeFrogFromBag() {
         for(Player player : players){
                 if(player.getFrogsInHand().size() < 2)  {
-                    gameBag.takeFrog(player.getPlayerColor());
-                    player.setMyFrogs(gameBag.getFrogsInBag(player.getPlayerColor()));
-                    player.setFrogsInHand(new Frog(player.getPlayerColor()));
+                    Frog takenFrog = gameBag.takeFrog();
+                    player.setMyFrogs(takenFrog);
+                    player.setFrogsInHand(takenFrog);
                 }
 
         }
     }
 
-    public void takeFrogFromBag(Color color) {
-
-
-        for(Player player : players){
-            if(player.getPlayerColor() == color && player.getFrogsInHand().size() < 2)  {
-                    gameBag.takeFrog(color);
-                    player.setMyFrogs(gameBag.getFrogsInBag(color));
-                    player.setFrogsInHand(new Frog(color));
-                }
-
+    public void takeFrogFromBag(Player player) {
+        if(player.getFrogsInHand().size() < 2)  {
+            Frog takenFrog = gameBag.takeFrog();
+            player.setMyFrogs(takenFrog);
+            player.setFrogsInHand(takenFrog);
         }
-
-
     }
+
 
     public boolean endGame() {
         spielLaueft = false;

@@ -52,10 +52,12 @@ public class Bag {
         return numoffrogs;
     }
 
-    public void takeFrog() {
+    public Frog takeFrog() {
         if(numoffrogs > 0) {
             numoffrogs = numoffrogs - 1;
+            return frogsInBag.remove(0);
         }
+        return null;
     }
 
     public void takeFrog(Color color) {
