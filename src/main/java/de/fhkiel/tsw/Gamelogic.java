@@ -16,16 +16,19 @@ public class Gamelogic implements Game {
     private int numOfPlayers;
     private int gameRound;
     private final boolean frogonBoard;
+    private Set<Position> sampleBoard;
 
     private final List<Frog> frogsOnBoard;
     private Set<Position> board;
     private Color selectedFrog;
+    private Position selectedPosition;
 
     public GamePhase getCurrentGamePhase() {
         return currentGamePhase;
     }
 
     private GamePhase currentGamePhase;
+
 
     public Player getCurrentPlayer() {
         return currentPlayer;
@@ -221,7 +224,7 @@ public class Gamelogic implements Game {
             Position newPos = new Position(selectedFrog, position.x(), position.y(), position.border());
             if(anlegen(newPos)){
                 nachziehen();
-                bewegen();;
+                bewegen(null);
                 selectedFrog = null;
                 endTurn();
 
@@ -238,7 +241,29 @@ public class Gamelogic implements Game {
         }
     }
 
-    public void bewegen(){
+    public void bewegen(Position destinedPosition){
+
+
+//        if(selectedPosition == destinedPosition){
+//            selectedPosition = null;
+//            return;
+//        }
+//        if(!possibleMovePositions().contains(destinedPosition)){
+//            System.out.println("Invalid move.");
+//            return;
+//        }
+//
+//        sampleBoard = new HashSet<>(board);
+//        sampleBoard.remove(selectedPosition);
+//        sampleBoard.add(destinedPosition);
+//        if(hatKetten(sampleBoard)){
+//            System.out.println("Invalid move. Chain formed.");
+//            return;
+//        }else{
+//            board = sampleBoard;
+//        }
+//        selectedPosition = null;
+
         if(currentGamePhase == GamePhase.BEWEGEN){
             currentGamePhase = GamePhase.ANLEGEN;
         }
@@ -280,6 +305,90 @@ public class Gamelogic implements Game {
     }
 
 
+    }
+
+    public List<Position> possibleMovePositions() {
+        List<Position> possibleMovePositions = new ArrayList<>();
+        for (Position pos : board) {
+            if (isPositionOccupied(pos)) {
+                for (Position neighbor : getPossibleNeighbors(pos)) {
+                    if (!isPositionOccupied(neighbor)) {
+                        possibleMovePositions.add(neighbor);
+                    }
+                }
+            }
+        }
+        return possibleMovePositions;
+    }
+
+    private boolean dfs(Position frog, Set<Position> visited, Set<Position> chain, int chainLength) {
+        visited.add(frog);
+        chain.add(frog);
+
+        List<Position> neighbors = getPossibleNeighbors(frog);
+        if (neighbors.size() > 2) {
+            return false;
+        }
+
+        for (Position neighbor : neighbors) {
+            if (!visited.contains(neighbor)) {
+                if (dfs(neighbor, visited, chain, chainLength)) {
+                    return true;
+                }
+            } else if (chain.size() >= chainLength && chain.contains(neighbor)) {
+                return true;
+            }
+        }
+
+        chain.remove(frog);
+
+        // Check if there's an element in the chain that has only one neighbor
+        for (Position position : chain) {
+            if (getPossibleNeighbors(position).size() == 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean hatKetten(Set<Position> sampleboard) {
+        Set<Position> visited = new HashSet<>();
+        Set<Position> chain = new HashSet<>();
+        for (Position frog : sampleboard) {
+            if (!visited.contains(frog)) {
+                chain.clear();
+                if (dfs(frog, visited, chain, 3)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private List<Position> getPossibleNeighbors(Position pos) {
+        List<Position> neighbors = new ArrayList<>();
+        int x = pos.x();
+        int y = pos.y();
+
+        if (y == 0 || (Math.abs(y) % 2) == 0) {
+            neighbors.add(new Position(pos.frog(), x + 1, y, pos.border())); // Right neighbor
+            neighbors.add(new Position(pos.frog(), x - 1, y, pos.border())); // Left neighbor
+            neighbors.add(new Position(pos.frog(), x, y - 1, pos.border())); // Upper-right neighbor
+            neighbors.add(new Position(pos.frog(), x, y + 1, pos.border())); // Lower-right neighbor
+            neighbors.add(new Position(pos.frog(), x - 1, y - 1, pos.border())); // Upper-left neighbor
+            neighbors.add(new Position(pos.frog(), x - 1, y + 1, pos.border())); // Lower-left neighbor
+        } else {
+            neighbors.add(new Position(pos.frog(), x + 1, y, pos.border())); // Right neighbor
+            neighbors.add(new Position(pos.frog(), x - 1, y, pos.border())); // Left neighbor
+            neighbors.add(new Position(pos.frog(), x + 1, y - 1, pos.border())); // Upper-right neighbor
+            neighbors.add(new Position(pos.frog(), x + 1, y + 1, pos.border())); // Lower-right neighbor
+            neighbors.add(new Position(pos.frog(), x, y - 1, pos.border())); // Upper-left neighbor
+            neighbors.add(new Position(pos.frog(), x, y + 1, pos.border())); // Lower-left neighbor
+        }
+
+        return neighbors;
     }
 
     @Override
@@ -415,10 +524,18 @@ public class Gamelogic implements Game {
             return true;
         }
         if( !isPositionOccupied(pos) && hasNeighbour(pos)){
+
+            sampleBoard = new HashSet<>(board);
+            sampleBoard.add(pos);
+            if(hatKetten(sampleBoard)){
+                System.out.println("Kette gebildet.");
+                return false;}
+            else{
                board.add(pos);
                 System.out.println("Anlegen erfolgreich.");
                 currentGamePhase = GamePhase.NACHZIEHEN;
                 return true;
+            }
            }
 
         return false;

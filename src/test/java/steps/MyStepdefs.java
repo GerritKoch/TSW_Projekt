@@ -468,7 +468,7 @@ public class MyStepdefs {
         assertThat(container.logicUnderTest.getCurrentGamePhase()).isEqualTo(Gamelogic.GamePhase.NACHZIEHEN);
         container.logicUnderTest.nachziehen();
         assertThat(container.logicUnderTest.getCurrentGamePhase()).isEqualTo(Gamelogic.GamePhase.BEWEGEN);
-        container.logicUnderTest.bewegen();
+        container.logicUnderTest.bewegen(null);
         assertThat(container.logicUnderTest.getCurrentGamePhase()).isEqualTo(Gamelogic.GamePhase.ANLEGEN);
     }
 }
