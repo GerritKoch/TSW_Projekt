@@ -494,7 +494,11 @@ public class Gamelogic implements Game {
     }
   }
 
-
+  /**
+   * Method to take a frog from the bag and give it to a specific player.
+   *
+   * @param player The player to give the frog to.
+   */
   public void takeFrogFromBag(Player player) {
     if (gameBag.getNumoffrogs() > 0 && player.getFrogsInHand().size() < 2) {
       Frog takenFrog = gameBag.takeFrog();
@@ -537,8 +541,6 @@ public class Gamelogic implements Game {
   }
 
 
-
-
   public boolean endGame() {
     return !spielLaueft;
   }
@@ -559,7 +561,12 @@ public class Gamelogic implements Game {
     return players;
   }
 
-
+  /**
+   * Method to place a frog on the board.
+   *
+   * @param pos The position to place the frog.
+   * @return True if the frog was placed successfully, false otherwise.
+   */
   public boolean anlegen(Position pos) {
     if (getBoard().isEmpty()) {
       board.add(pos);
@@ -585,27 +592,41 @@ public class Gamelogic implements Game {
     return false;
   }
 
+  /**
+   * Method to remove a frog from a player's hand.
+   *
+   * @param player    The player to remove the frog from.
+   * @param frogColor The color of the frog to remove.
+   */
   private void removeFrogFromHand(Player player, Color frogColor) {
     frogsInHandMap.get(player).remove(frogColor);
     player.getFrogsInHand().removeIf(frog -> frog.getFrogColor() == frogColor);
   }
 
-
+  /**
+   * Method to check if two positions are neighbours.
+   *
+   * @param q1 The x-coordinate of the first position.
+   * @param r1 The y-coordinate of the first position.
+   * @param q2 The x-coordinate of the second position.
+   * @param r2 The y-coordinate of the second position.
+   * @return True if the positions are neighbours, false otherwise.
+   */
   public boolean areNeighbours(int q1, int r1, int q2, int r2) {
     if (r1 == 0 || (abs(r1) % 2) == 0) {
-      return (q2 == q1 + 1 && r2 == r1) || // Right neighbor
-          (q2 == q1 - 1 && r2 == r1) || // Left neighbor
-          (q2 == q1 && r2 == r1 - 1) || // Upper-right neighbor
-          (q2 == q1 && r2 == r1 + 1) || // Lower-right neighbor
-          (q2 == q1 - 1 && r2 == r1 - 1) || // Upper-left neighbor
-          (q2 == q1 - 1 && r2 == r1 + 1); // Lower-left neighbor
+      return (q2 == q1 + 1 && r2 == r1)  // Right neighbor
+          || (q2 == q1 - 1 && r2 == r1)  // Left neighbor
+          || (q2 == q1 && r2 == r1 - 1)  // Upper-right neighbor
+          || (q2 == q1 && r2 == r1 + 1)  // Lower-right neighbor
+          || (q2 == q1 - 1 && r2 == r1 - 1)  // Upper-left neighbor
+          || (q2 == q1 - 1 && r2 == r1 + 1); // Lower-left neighbor
     } else {
-      return (q2 == q1 + 1 && r2 == r1) || // Right neighbor
-          (q2 == q1 - 1 && r2 == r1) || // Left neighbor
-          (q2 == q1 + 1 && r2 == r1 - 1) || // Upper-right neighbor
-          (q2 == q1 + 1 && r2 == r1 + 1) || // Lower-right neighbor
-          (q2 == q1 && r2 == r1 - 1) || // Upper-left neighbor
-          (q2 == q1 && r2 == r1 + 1); // Lower-left neighbor
+      return (q2 == q1 + 1 && r2 == r1)  // Right neighbor
+          || (q2 == q1 - 1 && r2 == r1) // Left neighbor
+          || (q2 == q1 + 1 && r2 == r1 - 1)  // Upper-right neighbor
+          || (q2 == q1 + 1 && r2 == r1 + 1)  // Lower-right neighbor
+          || (q2 == q1 && r2 == r1 - 1)  // Upper-left neighbor
+          || (q2 == q1 && r2 == r1 + 1); // Lower-left neighbor
     }
   }
 
@@ -621,8 +642,8 @@ public class Gamelogic implements Game {
 
   private boolean hasNeighbourOfSameColor(Position position) {
     for (Position pos : board) {
-      if (areNeighbours(position.x(), position.y(), pos.x(), pos.y()) &&
-          pos.frog() == currentPlayer.getPlayerColor()) {
+      if (areNeighbours(position.x(), position.y(), pos.x(), pos.y())
+          && pos.frog() == currentPlayer.getPlayerColor()) {
         return true;
       }
     }
