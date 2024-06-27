@@ -33,21 +33,27 @@ public class Bag {
    * This is the constructor for the Bag class.
    *
    * @param numoffrogs  the number of frogs in the bag
-   * @param playerCOlor the list of colors of the players
+   * @param playerColor the list of colors of the players
    */
-  public Bag(int numoffrogs, List<Color> playerCOlor) {
+  public Bag(int numoffrogs, List<Color> playerColor) {
 
     frogsInBag = new ArrayList<>();
     this.numoffrogs = numoffrogs;
 
-    for (Color playerColor : playerCOlor) {
+    for (Color playercolor : playerColor) {
       for (int i = 0; i < 10; i++) {
-        this.frogsInBag.add(new Frog(playerColor));
+        this.frogsInBag.add(new Frog(playercolor));
       }
     }
     bagFilled = true;
   }
 
+  /**
+   * This is the constructor for the Bag class.
+   *
+   * @param numoffrogs the number of frogs in the bag.
+   * @param players    the list of players.
+   */
   public Bag(int numoffrogs, Player[] players) {
     frogsInBag = new ArrayList<>();
     this.numoffrogs = numoffrogs;
@@ -58,10 +64,16 @@ public class Bag {
     bagFilled = true;
   }
 
+
   public int getNumoffrogs() {
     return numoffrogs;
   }
 
+  /**
+   * This method takes a frog from the bag.
+   *
+   * @return the frog that was taken from the bag
+   */
   public Frog takeFrog() {
     if (numoffrogs > 0) {
       numoffrogs = numoffrogs - 1;
@@ -70,6 +82,11 @@ public class Bag {
     return null;
   }
 
+  /**
+   * This method takes a frog from the bag.
+   *
+   * @param color the color of the frog that is taken from the bag
+   */
   public void takeFrog(Color color) {
     if (numoffrogs > 0) {
       numoffrogs = numoffrogs - 1;
