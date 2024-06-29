@@ -222,14 +222,34 @@ public class Gamelogic implements Game {
       Position newPos = new Position(selectedFrog, position.x(), position.y(), position.border());
       if (anlegen(newPos)) {
         nachziehen();
-        bewegen(null);
+        //bewegen(null);
         selectedFrog = null;
         endTurn();
 
       }
+    } else if (currentGamePhase == GamePhase.BEWEGEN && spielLaueft) {
+      if (selectedPosition == null) {
+
+        selectFrogToMove(position);
+
+      } else {
+        bewegen(position);
+      }
     }
 
 
+  }
+
+  private boolean selectFrogToMove(Position position) {
+    for (Position pos : board) {
+      if (pos.equals(position) && pos.frog() == currentPlayer.getPlayerColor()) {
+        selectedPosition = pos;
+        System.out.println("Frog selected for movement: " + pos);
+        return true;
+      }
+    }
+    System.out.println("Invalid frog selection: " + position);
+    return false;
   }
 
   public void nachziehen() {
@@ -239,35 +259,85 @@ public class Gamelogic implements Game {
     }
   }
 
+  private boolean canMoveFrog(Position from, Position to) {
+    int dx = to.x() - from.x();
+    int dy = to.y() - from.y();
+
+    if (dx != 0 && dy != 0) {
+      return false; // Move must be in a straight line
+    }
+
+    int stepX = Integer.signum(dx);
+    int stepY = Integer.signum(dy);
+
+    int currentX = from.x() + stepX;
+    int currentY = from.y() + stepY;
+
+    while (currentX != to.x() || currentY != to.y()) {
+      if (!isPositionOccupied(new Position(Color.None, currentX, currentY, Color.None))) {
+        return false;
+      }
+      currentX += stepX;
+      currentY += stepY;
+    }
+
+    return true;
+  }
+
+  private boolean canMoveAnyFrog() {
+    for (Position pos : board) {
+      if (pos.frog() == currentPlayer.getPlayerColor()) {
+        for (Position neighbor : getPossibleNeighbors(pos)) {
+          if (canMoveFrog(pos, neighbor)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+
+  /**
+   * Moves the selected frog to the destined position.
+   *
+   * @param destinedPosition The position where the frog is to be moved.
+   */
   public void bewegen(Position destinedPosition) {
 
 
-//        if(selectedPosition == destinedPosition){
-//            selectedPosition = null;
-//            return;
-//        }
-//        if(!possibleMovePositions().contains(destinedPosition)){
-//            System.out.println("Invalid move.");
-//            return;
-//        }
-//
-//        sampleBoard = new HashSet<>(board);
-//        sampleBoard.remove(selectedPosition);
-//        sampleBoard.add(destinedPosition);
-//        if(hatKetten(sampleBoard)){
-//            System.out.println("Invalid move. Chain formed.");
-//            return;
-//        }else{
-//            board = sampleBoard;
-//        }
-//        selectedPosition = null;
+    if (!possibleMovePositions().contains(destinedPosition)) {
+      System.out.println("Invalid move.");
+      return;
+    }
+
+
+//    sampleBoard = new HashSet<>(board);
+//    sampleBoard.remove(selectedPosition);
+//    sampleBoard.add(destinedPosition);
+//    if (hatKetten(sampleBoard)) {
+//      System.out.println("Invalid move. Chain formed.");
+//      return;
+//    } else {
+//      board = sampleBoard;
+//    }
+
+    board.remove(selectedPosition);
+
+    var newPos = new Position(selectedPosition.frog(), destinedPosition.x(), destinedPosition.y(),
+        destinedPosition.border());
+
+    board.add(newPos);
+    selectedPosition = null;
 
     if (currentGamePhase == GamePhase.BEWEGEN) {
       currentGamePhase = GamePhase.ANLEGEN;
     }
   }
 
-
+  /**
+   * Ends the current turn and proceeds to the next player.
+   */
   public void endTurn() {
     // Automatically proceed to the next player
 
