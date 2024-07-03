@@ -240,6 +240,57 @@ public class Gamelogic implements Game {
 
   }
 
+  private boolean hasNeighbourOfSameColor(Position position) {
+    for (Position pos : board) {
+      if (areNeighbours(position.x(), position.y(), pos.x(), pos.y())
+          && pos.frog() == currentPlayer.getPlayerColor()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isPositionValidForPlacement(Position pos) {
+    if (isPositionOccupied(pos) || !hasNeighbour(pos)) {
+      return false;
+    }
+    if (pos.frog() == currentPlayer.getPlayerColor()) {
+      return !hasNeighbourOfSameColor(pos);
+    }
+    return true;
+  }
+
+  private void checkPhases() {
+    if (currentGamePhase == GamePhase.BEWEGEN && !canMoveAnyFrog()) {
+      currentGamePhase = GamePhase.ANLEGEN;
+    }
+    if (currentGamePhase == GamePhase.ANLEGEN && !canPlaceAnyFrog()) {
+      currentGamePhase = GamePhase.NACHZIEHEN;
+    }
+    if (currentGamePhase == GamePhase.NACHZIEHEN) {
+      nachziehen();
+      bewegen(null);
+    }
+  }
+
+  private boolean canPlaceAnyFrog() {
+    if (board.isEmpty()) {
+      return true; // Always possible to place the first frog
+    }
+
+    for (Color frogColor : frogsInHandMap.get(currentPlayer)) {
+      for (int x = -50; x <= 50; x++) {
+        for (int y = -50; y <= 50; y++) {
+          Position pos = new Position(frogColor, x, y, Color.None);
+          if (isPositionValidForPlacement(pos)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   private boolean selectFrogToMove(Position position) {
     for (Position pos : board) {
       if (pos.equals(position) && pos.frog() == currentPlayer.getPlayerColor()) {
