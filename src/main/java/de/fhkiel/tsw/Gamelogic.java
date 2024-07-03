@@ -440,27 +440,43 @@ public class Gamelogic implements Game {
 
 
   private List<Position> getPossibleNeighbors(Position pos) {
-    List<Position> neighbors = new ArrayList<>();
+    List<Position> neigborsByPosition = new ArrayList<>();
     int x = pos.x();
     int y = pos.y();
 
     if (y == 0 || (Math.abs(y) % 2) == 0) {
-      neighbors.add(new Position(pos.frog(), x + 1, y, pos.border())); // Right neighbor
-      neighbors.add(new Position(pos.frog(), x - 1, y, pos.border())); // Left neighbor
-      neighbors.add(new Position(pos.frog(), x, y - 1, pos.border())); // Upper-right neighbor
-      neighbors.add(new Position(pos.frog(), x, y + 1, pos.border())); // Lower-right neighbor
-      neighbors.add(new Position(pos.frog(), x - 1, y - 1, pos.border())); // Upper-left neighbor
-      neighbors.add(new Position(pos.frog(), x - 1, y + 1, pos.border())); // Lower-left neighbor
+      neigborsByPosition.add(new Position(pos.frog(), x + 1, y, pos.border())); // Right neighbor
+      neigborsByPosition.add(new Position(pos.frog(), x - 1, y, pos.border())); // Left neighbor
+      neigborsByPosition.add(
+          new Position(pos.frog(), x, y - 1, pos.border())); // Upper-right neighbor
+      neigborsByPosition.add(
+          new Position(pos.frog(), x, y + 1, pos.border())); // Lower-right neighbor
+      neigborsByPosition.add(
+          new Position(pos.frog(), x - 1, y - 1, pos.border())); // Upper-left neighbor
+      neigborsByPosition.add(
+          new Position(pos.frog(), x - 1, y + 1, pos.border())); // Lower-left neighbor
     } else {
-      neighbors.add(new Position(pos.frog(), x + 1, y, pos.border())); // Right neighbor
-      neighbors.add(new Position(pos.frog(), x - 1, y, pos.border())); // Left neighbor
-      neighbors.add(new Position(pos.frog(), x + 1, y - 1, pos.border())); // Upper-right neighbor
-      neighbors.add(new Position(pos.frog(), x + 1, y + 1, pos.border())); // Lower-right neighbor
-      neighbors.add(new Position(pos.frog(), x, y - 1, pos.border())); // Upper-left neighbor
-      neighbors.add(new Position(pos.frog(), x, y + 1, pos.border())); // Lower-left neighbor
+      neigborsByPosition.add(new Position(pos.frog(), x + 1, y, pos.border())); // Right neighbor
+      neigborsByPosition.add(new Position(pos.frog(), x - 1, y, pos.border())); // Left neighbor
+      neigborsByPosition.add(
+          new Position(pos.frog(), x + 1, y - 1, pos.border())); // Upper-right neighbor
+      neigborsByPosition.add(
+          new Position(pos.frog(), x + 1, y + 1, pos.border())); // Lower-right neighbor
+      neigborsByPosition.add(
+          new Position(pos.frog(), x, y - 1, pos.border())); // Upper-left neighbor
+      neigborsByPosition.add(
+          new Position(pos.frog(), x, y + 1, pos.border())); // Lower-left neighbor
     }
 
-    return neighbors;
+    List<Position> actualNeighbors = new ArrayList<>();
+    for (Position neighbor : neigborsByPosition) {
+      for (Position realFrog : board) {
+        if (realFrog.x() == neighbor.x() && realFrog.y() == neighbor.y()) {
+          actualNeighbors.add(realFrog);
+        }
+      }
+    }
+    return actualNeighbors;
   }
 
   @Override
