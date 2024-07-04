@@ -18,7 +18,7 @@ public class Gamelogic implements Game {
   private int numOfPlayers;
   private int gameRound;
   private final boolean frogonBoard;
-  private Set<Position> sampleBoard;
+  private List<Position> sampleMovePositions;
 
   private final List<Frog> frogsOnBoard;
   private Set<Position> board;
@@ -166,7 +166,7 @@ public class Gamelogic implements Game {
   public List<Color> getFrogsInHand(Color color) {
     Player player = getPlayerByColor(color);
     if (player != null) {
-      System.out.println("getFrogsInHand(" + color + ") ausgeführt.");
+      //System.out.println("getFrogsInHand(" + color + ") ausgeführt.");
       return frogsInHandMap.getOrDefault(player, new ArrayList<>());
     } else {
       System.out.println("No player found with color: " + color);
@@ -225,12 +225,21 @@ public class Gamelogic implements Game {
         //bewegen(null);
         selectedFrog = null;
         endTurn();
+        System.out.println("Change to  BEWEGEN");
+
+        if (canMoveAnyFrog()) {
+          currentGamePhase = GamePhase.BEWEGEN;
+        } else {
+          currentGamePhase = GamePhase.ANLEGEN;
+        }
+
 
       }
     } else if (currentGamePhase == GamePhase.BEWEGEN && spielLaueft) {
       if (selectedPosition == null) {
 
         selectFrogToMove(position);
+        sampleMovePositions = possibleMovePositions();
 
       } else {
         bewegen(position);
@@ -260,18 +269,18 @@ public class Gamelogic implements Game {
     return true;
   }
 
-  private void checkPhases() {
-    if (currentGamePhase == GamePhase.BEWEGEN && !canMoveAnyFrog()) {
-      currentGamePhase = GamePhase.ANLEGEN;
-    }
-    if (currentGamePhase == GamePhase.ANLEGEN && !canPlaceAnyFrog()) {
-      currentGamePhase = GamePhase.NACHZIEHEN;
-    }
-    if (currentGamePhase == GamePhase.NACHZIEHEN) {
-      nachziehen();
-      bewegen(null);
-    }
-  }
+//  private void checkPhases() {
+//    if (currentGamePhase == GamePhase.BEWEGEN && !canMoveAnyFrog()) {
+//      currentGamePhase = GamePhase.ANLEGEN;
+//    }
+//    if (currentGamePhase == GamePhase.ANLEGEN && !canPlaceAnyFrog()) {
+//      currentGamePhase = GamePhase.NACHZIEHEN;
+//    }
+//    if (currentGamePhase == GamePhase.NACHZIEHEN) {
+//      nachziehen();
+//      bewegen(null);
+//    }
+//  }
 
   private boolean canPlaceAnyFrog() {
     if (board.isEmpty()) {
@@ -306,7 +315,7 @@ public class Gamelogic implements Game {
   public void nachziehen() {
     if (currentGamePhase == GamePhase.NACHZIEHEN) {
       takeFrogFromBag(currentPlayer);
-      currentGamePhase = GamePhase.BEWEGEN;
+
     }
   }
 
@@ -338,7 +347,7 @@ public class Gamelogic implements Game {
   private boolean canMoveAnyFrog() {
     for (Position pos : board) {
       if (pos.frog() == currentPlayer.getPlayerColor()) {
-        for (Position neighbor : getPossibleNeighbors(pos)) {
+        for (Position neighbor : getNeigbours(pos)) {
           if (canMoveFrog(pos, neighbor)) {
             return true;
           }
@@ -357,31 +366,36 @@ public class Gamelogic implements Game {
   public void bewegen(Position destinedPosition) {
 
 
-    if (!possibleMovePositions().contains(destinedPosition)) {
+    //List<Position> possibleMovePositions = possibleMovePositions();
+
+    if (sampleMovePositions == null || sampleMovePositions.isEmpty()) {
+      System.out.println("No possible move positions.");
+      return;
+    }
+
+    if (!sampleMovePositions.contains(destinedPosition)) {
       System.out.println("Invalid move.");
       return;
     }
 
 
-//    sampleBoard = new HashSet<>(board);
-//    sampleBoard.remove(selectedPosition);
-//    sampleBoard.add(destinedPosition);
-//    if (hatKetten(sampleBoard)) {
-//      System.out.println("Invalid move. Chain formed.");
-//      return;
-//    } else {
-//      board = sampleBoard;
-//    }
-
-    board.remove(selectedPosition);
-
+    Set<Position> sampleBoard = new HashSet<>(board);
+    sampleBoard.remove(selectedPosition);
     var newPos = new Position(selectedPosition.frog(), destinedPosition.x(), destinedPosition.y(),
         destinedPosition.border());
+    sampleBoard.add(newPos);
+    if (!validateMove(selectedPosition, newPos, sampleBoard)) {
+      System.out.println("Invalid move.");
+      return;
+    } else {
+      board = sampleBoard;
+      //board.remove(selectedPosition);
+      System.out.println("Moving frog from " + selectedPosition + " to " + newPos);
+      //board.add(newPos);
+      selectedPosition = null;
+    }
 
-    board.add(newPos);
-    selectedPosition = null;
-
-    if (currentGamePhase == GamePhase.BEWEGEN) {
+    if (currentGamePhase == GamePhase.BEWEGEN && !canMoveAnyFrog()) {
       currentGamePhase = GamePhase.ANLEGEN;
     }
   }
@@ -434,21 +448,63 @@ public class Gamelogic implements Game {
     List<Position> possibleMovePositions = new ArrayList<>();
     for (Position pos : board) {
       if (isPositionOccupied(pos)) {
-        for (Position neighbor : getPossibleNeighbors(pos)) {
+        for (Position neighbor : getBounderingNeighbours(pos)) {
           if (!isPositionOccupied(neighbor)) {
             possibleMovePositions.add(neighbor);
           }
         }
       }
     }
+    for (Position pos : possibleMovePositions) {
+      System.out.println("Possible move position is : " + pos);
+    }
+
+
     return possibleMovePositions;
+  }
+
+  private boolean validateMove(Position from, Position to, Set<Position> sampleBoard) {
+    if (!isInStraightLine(from, to, sampleBoard)) {
+      return false;
+    }
+    if (!isFrogBetweenUs(from, to, sampleBoard)) {
+      return false;
+    }
+    return isZusammenhaengend(from, to, sampleBoard);
+  }
+
+  private boolean isZusammenhaengend(Position from, Position to, Set<Position> sampleBoard) {
+    boolean verify = false;
+    var listBoard = sampleBoard.stream().toList();
+    var visited = new HashSet<Position>();
+    var len = listBoard.size();
+    System.out.println("len: " + len);
+    var len2 = bfs(to, listBoard, visited);
+    System.out.println("len2: " + len2);
+    if (len == len2) {
+      verify = true;
+    }
+    if (verify) {
+      System.out.println("Zusammenhängend");
+    } else {
+      System.out.println("Nicht zusammenhängend");
+    }
+    return verify;
+  }
+
+  private boolean isFrogBetweenUs(Position from, Position to, Set<Position> sampleBoard) {
+    return true;
+  }
+
+  private boolean isInStraightLine(Position from, Position to, Set<Position> sampleBoard) {
+    return true;
   }
 
   private boolean dfs(Position frog, Set<Position> visited, Set<Position> chain, int chainLength) {
     visited.add(frog);
     chain.add(frog);
 
-    List<Position> neighbors = getPossibleNeighbors(frog);
+    List<Position> neighbors = getNeigbours(frog);
     if (neighbors.size() > 2) {
       return false;
     }
@@ -467,7 +523,7 @@ public class Gamelogic implements Game {
 
     // Check if there's an element in the chain that has only one neighbor
     for (Position position : chain) {
-      if (getPossibleNeighbors(position).size() == 1) {
+      if (getNeigbours(position).size() == 1) {
         return true;
       }
     }
@@ -490,34 +546,8 @@ public class Gamelogic implements Game {
   }
 
 
-  private List<Position> getPossibleNeighbors(Position pos) {
-    List<Position> neigborsByPosition = new ArrayList<>();
-    int x = pos.x();
-    int y = pos.y();
-
-    if (y == 0 || (Math.abs(y) % 2) == 0) {
-      neigborsByPosition.add(new Position(pos.frog(), x + 1, y, pos.border())); // Right neighbor
-      neigborsByPosition.add(new Position(pos.frog(), x - 1, y, pos.border())); // Left neighbor
-      neigborsByPosition.add(
-          new Position(pos.frog(), x, y - 1, pos.border())); // Upper-right neighbor
-      neigborsByPosition.add(
-          new Position(pos.frog(), x, y + 1, pos.border())); // Lower-right neighbor
-      neigborsByPosition.add(
-          new Position(pos.frog(), x - 1, y - 1, pos.border())); // Upper-left neighbor
-      neigborsByPosition.add(
-          new Position(pos.frog(), x - 1, y + 1, pos.border())); // Lower-left neighbor
-    } else {
-      neigborsByPosition.add(new Position(pos.frog(), x + 1, y, pos.border())); // Right neighbor
-      neigborsByPosition.add(new Position(pos.frog(), x - 1, y, pos.border())); // Left neighbor
-      neigborsByPosition.add(
-          new Position(pos.frog(), x + 1, y - 1, pos.border())); // Upper-right neighbor
-      neigborsByPosition.add(
-          new Position(pos.frog(), x + 1, y + 1, pos.border())); // Lower-right neighbor
-      neigborsByPosition.add(
-          new Position(pos.frog(), x, y - 1, pos.border())); // Upper-left neighbor
-      neigborsByPosition.add(
-          new Position(pos.frog(), x, y + 1, pos.border())); // Lower-left neighbor
-    }
+  private List<Position> getNeigbours(Position pos) {
+    List<Position> neigborsByPosition = getBounderingNeighbours(pos);
 
     List<Position> actualNeighbors = new ArrayList<>();
     for (Position neighbor : neigborsByPosition) {
@@ -527,7 +557,45 @@ public class Gamelogic implements Game {
         }
       }
     }
+
+    System.out.println("Possible neighbors for " + pos + " are:\n");
+
+
     return actualNeighbors;
+  }
+
+  List<Position> getBounderingNeighbours(Position pos) {
+
+    List<Position> neigbors = new ArrayList<>();
+    int x = pos.x();
+    int y = pos.y();
+
+    if (y == 0 || (Math.abs(y) % 2) == 0) {
+      neigbors.add(new Position(Color.None, x + 1, y, pos.border())); // Right neighbor
+      neigbors.add(new Position(Color.None, x - 1, y, pos.border())); // Left neighbor
+      neigbors.add(
+          new Position(Color.None, x, y - 1, pos.border())); // Upper-right neighbor
+      neigbors.add(
+          new Position(Color.None, x, y + 1, pos.border())); // Lower-right neighbor
+      neigbors.add(
+          new Position(Color.None, x - 1, y - 1, pos.border())); // Upper-left neighbor
+      neigbors.add(
+          new Position(Color.None, x - 1, y + 1, pos.border())); // Lower-left neighbor
+    } else {
+      neigbors.add(new Position(Color.None, x + 1, y, pos.border())); // Right neighbor
+      neigbors.add(new Position(Color.None, x - 1, y, pos.border())); // Left neighbor
+      neigbors.add(
+          new Position(Color.None, x + 1, y - 1, pos.border())); // Upper-right neighbor
+      neigbors.add(
+          new Position(Color.None, x + 1, y + 1, pos.border())); // Lower-right neighbor
+      neigbors.add(
+          new Position(Color.None, x, y - 1, pos.border())); // Upper-left neighbor
+      neigbors.add(
+          new Position(Color.None, x, y + 1, pos.border())); // Lower-left neighbor
+    }
+
+    return neigbors;
+
   }
 
   @Override
@@ -549,7 +617,9 @@ public class Gamelogic implements Game {
 
           if (size == 7 && count == 7) {
             return player.getPlayerColor();
-          } else if (size > 7 && count == size) {
+          }
+
+          if (size > 7 && count == size) {
             return player.getPlayerColor();
           }
 
@@ -665,18 +735,19 @@ public class Gamelogic implements Game {
     }
     if (!isPositionOccupied(pos) && hasNeighbour(pos)) {
 
-      sampleBoard = new HashSet<>(board);
-      sampleBoard.add(pos);
-      if (hatKetten(sampleBoard)) {
-        System.out.println("Kette gebildet.");
-        return false;
-      } else {
-        board.add(pos);
-        System.out.println("Anlegen erfolgreich.");
-        currentGamePhase = GamePhase.NACHZIEHEN;
-        return true;
-      }
+      board.add(pos);
+//      sampleBoard = new HashSet<>(board);
+//      sampleBoard.add(pos);
+//      if (hatKetten(sampleBoard)) {
+//        System.out.println("Kette gebildet.");
+//        return false;
+//      } else {
+//        board.add(pos);
+//        System.out.println("Anlegen erfolgreich.");
+//        currentGamePhase = GamePhase.NACHZIEHEN;
+      return true;
     }
+
 
     return false;
   }
