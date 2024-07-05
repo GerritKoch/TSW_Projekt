@@ -43,11 +43,22 @@ public class Gamelogic implements Game {
     return gameRound;
   }
 
+  public Direction currentDirection;
+
 
   public enum GamePhase {
     ANLEGEN,
     NACHZIEHEN,
     BEWEGEN
+  }
+
+  public enum Direction {
+    LEFT,
+    RIGHT,
+    UPPER_RIGHT,
+    UPPER_LEFT,
+    LOWER_LEFT,
+    LOWER_RIGHT;
   }
 
   public Gamelogic() {
@@ -117,6 +128,7 @@ public class Gamelogic implements Game {
       }
     }
 
+    selectedPosition = null;
 
     return true;
   }
@@ -419,7 +431,7 @@ public class Gamelogic implements Game {
   private boolean isPositionOccupied(Position position) {
     for (Position pos : board) {
       if (pos.x() == position.x() && pos.y() == position.y()) {
-        System.out.println("Position " + position + " ist bereits besetzt.");
+        //System.out.println("Position " + position + " ist bereits besetzt.");
         return true;
       }
     }
@@ -455,22 +467,36 @@ public class Gamelogic implements Game {
         }
       }
     }
-    for (Position pos : possibleMovePositions) {
-      System.out.println("Possible move position is : " + pos);
-    }
+//    for (Position pos : possibleMovePositions) {
+//      System.out.println("Possible move position is : " + pos);
+//    }
 
 
     return possibleMovePositions;
   }
 
   private boolean validateMove(Position from, Position to, Set<Position> sampleBoard) {
-    if (!isInStraightLine(from, to, sampleBoard)) {
-      return false;
+
+
+    if (isFrogBetweenUs(from, to, sampleBoard)
+        &&
+        isZusammenhaengend(from, to, sampleBoard)
+        &&
+        isInStraightLine(from, to)) {
+      System.out.println("Valid move");
+      return true;
     }
-    if (!isFrogBetweenUs(from, to, sampleBoard)) {
-      return false;
+
+    return false;
+  }
+
+  private int gcd(int a, int b) {
+    while (b != 0) {
+      int temp = b;
+      b = a % b;
+      a = temp;
     }
-    return isZusammenhaengend(from, to, sampleBoard);
+    return a;
   }
 
   private boolean isZusammenhaengend(Position from, Position to, Set<Position> sampleBoard) {
@@ -493,11 +519,191 @@ public class Gamelogic implements Game {
   }
 
   private boolean isFrogBetweenUs(Position from, Position to, Set<Position> sampleBoard) {
+    // Calculate direction vector considering parity of 'r'
+
+
     return true;
+
+//    int dq = to.x() - from.x();
+//    int dr = to.y() - from.y();
+//
+//    // Normalize the direction vector
+//    int gcd = gcd(Math.abs(dq), Math.abs(dr));
+//    dq /= gcd;
+//    dr /= gcd;
+//
+//    // Traverse from 'from' to 'to' in steps of the direction vector
+//    int q = from.x();
+//    int r = from.y();
+//    boolean hopFound = false;
+//
+//    while (q != to.x() || r != to.y()) {
+//      q += dq;
+//      r += dr;
+//      int finalQ = q;
+//      int finalR = r;
+//      Position current = sampleBoard.stream()
+//          .filter(p -> p.x() == finalQ && p.y() == finalR)
+//          .findFirst()
+//          .orElse(null);
+//      if (current == null) {
+//        return false; // Invalid move, position not part of the board
+//      }
+//      if (!current.frog().equals(Color.None) && !(q == to.x() && r == to.y())) {
+//        hopFound = true; // Found a frog in the path
+//      }
+//    }
+//
+//    if (hopFound) {
+//      System.out.println("Frog found in between");
+//    } else {
+//      System.out.println("No frog found in between");
+//    }
+//    return hopFound;
+
+
   }
 
   private boolean isInStraightLine(Position from, Position to, Set<Position> sampleBoard) {
+    // Calculate direction vector
+    int dq = to.x() - from.x();
+    int dr = to.y() - from.y();
+
+    // Normalize the direction vector
+    int gcd = gcd(Math.abs(dq), Math.abs(dr));
+    dq /= gcd;
+    dr /= gcd;
+
+    // Traverse from 'from' to 'to' in steps of the direction vector
+    int q = from.x();
+    int r = from.y();
+    while (q != to.x() || r != to.y()) {
+      q += dq;
+      r += dr;
+      Position current = new Position(from.frog(), q, r, from.border());
+      if (!sampleBoard.contains(current)) {
+        System.out.println("Is not in straight line");
+        return false;
+      }
+    }
+    System.out.println("Is in straight line");
     return true;
+  }
+
+  private boolean isInStraightLine(Position from, Position to) {
+
+    if (checkDirection(from.x(), from.y(), to.x(), to.y())) {
+      System.out.println("Is in straight line");
+      return true;
+    }
+    System.out.println("Is not in straight line");
+    return false;
+  }
+
+  private boolean checkDirection(int q1, int r1, int q2, int r2) {
+
+    //System.out.println("Started checkDirection");
+    int size = board.size() + 1;
+
+
+    int lQ1 = q1, rQ1 = q1, ulQ1 = q1, urQ1 = q1, llQ1 = q1, lrQ1 = q1;
+    int lR1 = r1, rR1 = r1, ulR1 = r1, urR1 = r1, llR1 = r1, lrR1 = r1;
+    int lQ2 = q2, rQ2 = q2, ulQ2 = q2, urQ2 = q2, llQ2 = q2, lrQ2 = q2;
+    int lR2 = r2, rR2 = r2, ulR2 = r2, urR2 = r2, llR2 = r2, lrR2 = r2;
+
+    for (int i = 0; i < size; i++) {
+
+
+      //check right
+      if (rR1 == rR2 && ++rQ1 == rQ2) {
+        currentDirection = Direction.RIGHT;
+        System.out.println("Is Right");
+        return true;
+      }
+
+      //check left
+      if (lR1 == lR2 && --lQ1 == lQ2) {
+        currentDirection = Direction.LEFT;
+        System.out.println("Is Left");
+        return true;
+      }
+
+      //check upper right
+      if (urR1 == 0 || (Math.abs(urR1) % 2) == 0) {
+        --urR1;
+        if (urQ1 == urQ2 && urR1 == urR2) {
+          currentDirection = Direction.UPPER_RIGHT;
+          System.out.println("Is Upper Right");
+          return true;
+        }
+      } else {
+        ++urQ1;
+        --urR1;
+        if (urQ1 == urQ2 && urR1 == urR2) {
+          currentDirection = Direction.UPPER_RIGHT;
+          System.out.println("Is Upper Right");
+          return true;
+        }
+      }
+
+      //check lower right
+      if (lrR1 == 0 || (Math.abs(lrR1) % 2) == 0) {
+        ++lrR1;
+        if (lrQ1 == lrQ2 && lrR1 == lrR2) {
+          currentDirection = Direction.LOWER_RIGHT;
+          System.out.println("Is Lower Right");
+          return true;
+        }
+      } else {
+        ++lrQ1;
+        ++lrR1;
+        if (lrQ1 == lrQ2 && lrR1 == lrR2) {
+          currentDirection = Direction.LOWER_RIGHT;
+          System.out.println("Is Lower Right");
+          return true;
+        }
+      }
+
+      //check upper left
+      if (ulR1 == 0 || (Math.abs(ulR1) % 2) == 0) {
+        --ulR1;
+        --ulQ1;
+        if (ulQ1 == ulQ2 && ulR1 == ulR2) {
+          currentDirection = Direction.UPPER_LEFT;
+          System.out.println("Is Upper Left");
+          return true;
+        }
+      } else {
+        ulR1--;
+        if (ulQ1 == ulQ2 && ulR1 == ulR2) {
+          currentDirection = Direction.UPPER_LEFT;
+          System.out.println("Is Upper Left");
+          return true;
+        }
+      }
+
+      //check lower left
+      if (llR1 == 0 || (Math.abs(llR1) % 2) == 0) {
+        llQ1--;
+        llR1++;
+        if (llQ1 == llQ2 && llR1 == llR2) {
+          currentDirection = Direction.LOWER_LEFT;
+          System.out.println("Is Lower Left");
+          return true;
+        }
+      } else {
+        llR1++;
+        if (llQ1 == llQ2 && llR1 == llR2) {
+          currentDirection = Direction.LOWER_LEFT;
+          System.out.println("Is Lower Left");
+          return true;
+        }
+      }
+
+    }
+
+
+    return false;
   }
 
   private boolean dfs(Position frog, Set<Position> visited, Set<Position> chain, int chainLength) {
