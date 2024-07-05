@@ -31,6 +31,7 @@ public class Gamelogic implements Game {
   private final List<Frog> frogsOnBoard;
   private Set<Position> board;
   private Position selectedFrogPosition;
+  private Position destinationPosition;
   private Set<Position> viableJumpLocations = new HashSet<>();
   private Color selectedFrog;
   private Position lastClickedPosition;
@@ -96,7 +97,7 @@ public class Gamelogic implements Game {
     players = new Player[numberOfPlayers];
 
     List<Color> colorList =
-        new ArrayList<>(Arrays.asList(Color.Red, Color.Blue, Color.Green, Color.Black));
+        new ArrayList<>(Arrays.asList(Color.Red, Color.Blue, Color.Green, Color.White));
 
     if (numberOfPlayers < colorList.size()) {
       colorList.subList(numberOfPlayers, colorList.size()).clear();
@@ -230,36 +231,80 @@ public class Gamelogic implements Game {
   }
 
 
+//  private void calculateViableJumpLocations(Position frogPosition) {
+//    viableJumpLocations.clear();
+//    int[] dxEven = {1, -1, 0, 0, -1, -1};
+//    int[] dyEven = {0, 0, -1, 1, -1, 1};
+//    int[] dxOdd = {1, -1, 0, 0, 1, 1};
+//    int[] dyOdd = {0, 0, -1, 1, -1, 1};
+//
+//    int[] dx = (frogPosition.x() % 2 == 0) ? dxEven : dxOdd;
+//  //  int[] dx = (frogPosition.x() % 2 == 0) ? dxEven : dxOdd;
+//    int[] dy = (frogPosition.y() % 2 == 0) ? dyEven : dyOdd;
+//
+//    // print all dx and dy
+//    for (int i = 0; i < dx.length; i++) {
+//      System.out.println("dx[" + i + "] = " + dx[i]);
+//      System.out.println("dy[" + i + "] = " + dy[i]);
+//    }
+//
+//    for (int i = 0; i < dx.length; i++) {
+//      int x = frogPosition.x() + dx[i];
+//      int y = frogPosition.y() + dy[i];
+//      Position neighbor = new Position(Color.None, x, y, Color.None);
+//      if (isPositionOccupied(neighbor)) {
+//        // Search for the first unoccupied position in the same direction
+//        while (isPositionOccupied(neighbor)) {
+//          x += dx[i];
+//          y += dy[i];
+//          neighbor = new Position(Color.None, x, y, Color.None);
+//        }
+//        /* Check if the first unoccupied position is directly behind the
+//         sequence of occupied positions */
+//        if (!isPositionOccupied(neighbor)) {
+//          viableJumpLocations.add(neighbor);
+//          System.out.println("Viable jump location added: " + neighbor);
+//        }
+//      }
+//    }
+//  }
+
   private void calculateViableJumpLocations(Position frogPosition) {
     viableJumpLocations.clear();
-    int[] dxEven = {1, -1, 0, 0, -1, -1};
-    int[] dyEven = {0, 0, -1, 1, -1, 1};
-    int[] dxOdd = {1, -1, 0, 0, 1, 1};
-    int[] dyOdd = {0, 0, -1, 1, -1, 1};
+    int[][] evenOffsets = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}, {-1, -1}, {1, -1}};
+    int[][] oddOffsets = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}, {-1, 1}, {1, 1}};
 
-    int[] dx = (frogPosition.y() % 2 == 0) ? dxEven : dxOdd;
-    int[] dy = (frogPosition.y() % 2 == 0) ? dyEven : dyOdd;
+    int[][] offsets = (frogPosition.y() % 2 == 0) ? evenOffsets : oddOffsets;
 
-    for (int i = 0; i < dx.length; i++) {
-      int x = frogPosition.x() + dx[i];
-      int y = frogPosition.y() + dy[i];
+    for (int[] offset : offsets) {
+      int x = frogPosition.x() + offset[0];
+      int y = frogPosition.y() + offset[1];
       Position neighbor = new Position(Color.None, x, y, Color.None);
+      boolean hasJumpedOver = false;
+
+      // Check if the initial position is occupied
       if (isPositionOccupied(neighbor)) {
-        // Search for the first unoccupied position in the same direction
+        hasJumpedOver = true;
+
+        // Continue moving in the same direction
         while (isPositionOccupied(neighbor)) {
-          x += dx[i];
-          y += dy[i];
+          x += offset[0];
+          y += offset[1];
           neighbor = new Position(Color.None, x, y, Color.None);
         }
-        /* Check if the first unoccupied position is directly behind the
-         sequence of occupied positions */
-        if (!isPositionOccupied(neighbor)) {
+
+        // Add the first unoccupied position in the direction if a jump occurred
+        if (!isPositionOccupied(neighbor) && hasJumpedOver) {
           viableJumpLocations.add(neighbor);
           System.out.println("Viable jump location added: " + neighbor);
         }
       }
     }
   }
+
+
+
+
 
 
   @Override
@@ -287,9 +332,7 @@ public class Gamelogic implements Game {
           calculateViableJumpLocations(selectedFrogPosition); // Recalculate viable jumps
 
           // Check for double-click to end the move
-          if (position.equals(lastClickedPosition)
-              &&
-              (System.currentTimeMillis() - lastClickTime) < DOUBLE_CLICK_THRESHOLD) {
+          if (position.equals(lastClickedPosition) && (System.currentTimeMillis() - lastClickTime) < DOUBLE_CLICK_THRESHOLD) {
             selectedFrogPosition = null;
             viableJumpLocations.clear();
             checkPhases();
@@ -304,6 +347,9 @@ public class Gamelogic implements Game {
       }
     }
   }
+
+
+
 
 
   private boolean selectFrogToMove(Position position) {
@@ -345,27 +391,39 @@ public class Gamelogic implements Game {
    * @param from The position of the frog to move
    * @param to   The position to move the frog to
    */
-  public void moveFrog(Position from, Position to) {
-    if (currentGamePhase == GamePhase.BEWEGEN && isPositionOccupied(from)
-        &&
-        viableJumpLocations.contains(to)) {
-      Position frogToMove = null;
-      for (Position pos : board) {
-        if (pos.equals(from) && pos.frog() == currentPlayer.getPlayerColor()) {
-          frogToMove = pos;
-          break;
-        }
-      }
+//  public void moveFrog(Position from, Position to) {
+//    if (currentGamePhase == GamePhase.BEWEGEN && isPositionOccupied(from)
+//        &&
+//        viableJumpLocations.contains(to)) {
+//        destinationPosition = new Position(from.frog(), to.x(), to.y(), from.border());
+//        board.remove(from);
+//        board.add(destinationPosition);
+//        System.out.println("Frog moved from " + from + " to " + destinationPosition);
+//        //selectedFrogPosition = to;
+//        calculateViableJumpLocations(destinationPosition); // Recalculate viable jumps after moving
+//
+//    }
+//  }
 
-      if (frogToMove != null) {
-        board.remove(frogToMove);
-        board.add(new Position(frogToMove.frog(), to.x(), to.y(), Color.None));
-        System.out.println("Frog moved from " + from + " to " + to);
-        selectedFrogPosition = to;
-        calculateViableJumpLocations(selectedFrogPosition); // Recalculate viable jumps after moving
-      }
+  public void moveFrog(Position from, Position to) {
+    if (currentGamePhase == GamePhase.BEWEGEN && isPositionOccupied(from) && viableJumpLocations.contains(to)) {
+      // Create the new destination position with the frog's color from the original position
+      Position destinationPosition = new Position(from.frog(), to.x(), to.y(), from.border());
+
+      // Remove the frog from the current position
+      board.remove(from);
+
+      // Add the frog to the new destination position
+      board.add(destinationPosition);
+
+      // Output the move for debugging
+      System.out.println("Frog moved from " + from + " to " + destinationPosition);
+
+      // Recalculate viable jump locations after moving the frog
+      calculateViableJumpLocations(destinationPosition);
     }
   }
+
 
 
   private boolean canMoveFrog(Position from, Position to) {
