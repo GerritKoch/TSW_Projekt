@@ -756,21 +756,26 @@ public class Gamelogic implements Game {
     return false;
   }
 
+  // DFS-Methode zur Zählung der Größe der verbundenen Komponente
+
   private boolean dfs(Position frog, Set<Position> visited, Set<Position> chain, int chainLength) {
     visited.add(frog);
     chain.add(frog);
 
     List<Position> neighbors = getNeigbours(frog);
+    System.out.println("Neighbors in dfs: " + neighbors.size());
     if (neighbors.size() > 2) {
       return false;
     }
 
     for (Position neighbor : neighbors) {
-      if (!visited.contains(neighbor)) {
+      if (!visited.contains(neighbor) && getNeigbours(neighbor).size() <= 2) {
         if (dfs(neighbor, visited, chain, chainLength)) {
+
           return true;
         }
       } else if (chain.size() >= chainLength && chain.contains(neighbor)) {
+        //System.out.println("");
         return true;
       }
     }
@@ -779,7 +784,8 @@ public class Gamelogic implements Game {
 
     // Check if there's an element in the chain that has only one neighbor
     for (Position position : chain) {
-      if (getNeigbours(position).size() == 1) {
+      if (getNeigbours(position).size() == 1 && chain.size() >= 3) {
+
         return true;
       }
     }
@@ -948,23 +954,50 @@ public class Gamelogic implements Game {
     return count;
   }
 
-  public boolean hatkeineKetten(Set<Position> sampleboard) {
+  public boolean hatkeineKetten(Set<Position> sampleboard, Position start) {
+
     Set<Position> visited = new HashSet<>();
     List<Position> positionsOfSinglePlayer = sampleboard.stream().toList();
     int chainLength = 0;
-    for (Position start : positionsOfSinglePlayer) {
-      if (!visited.contains(start)) {
-        chainLength = bfs(start, positionsOfSinglePlayer, visited);
-        if (chainLength >= 3) {
-          System.out.println("Hat Ketten ");
-          return false;
-        }
+
+    if (!visited.contains(start)) {
+      chainLength = bfs(start, positionsOfSinglePlayer, visited);
+      if (chainLength >= 3) {
+        System.out.println("Kettenlänge: " + chainLength);
+        System.out.println("Hat Ketten ");
+        return false;
+
       }
+
     }
     System.out.println("Hat keine Ketten ");
     System.out.println("Kettenlänge: " + chainLength);
     return true;
   }
+
+  // Check if there are chains of 3 individual connections between frogs
+  private boolean hasNoChains(Set<Position> froschfeld) {
+    boolean hatKetten = true;
+    Set<Position> visited = new HashSet<>();
+    Set<Position> chain = new HashSet<>();
+    for (Position frog : froschfeld) {
+      if (!visited.contains(frog)) {
+        chain.clear();
+        System.out.println("kommt rein in hasNoChains");
+        if (dfs(frog, visited, chain, 3)) {
+          System.out.println("Hat Ketten ");
+          hatKetten = false;
+          break;
+        }
+      }
+    }
+
+    if (!hatKetten) {
+      System.out.println("Hat keine Ketten ");
+    }
+    return hatKetten;
+  }
+
 
   public void takeFrogFromBag(Player player) {
 
@@ -1014,7 +1047,8 @@ public class Gamelogic implements Game {
 //      currentGamePhase = GamePhase.NACHZIEHEN;
       var sampleBoard = new HashSet<>(board);
       sampleBoard.add(pos);
-      if (!hatkeineKetten(sampleBoard)) {
+      // if (!hatkeineKetten(sampleBoard, pos)) {
+      if (!hasNoChains(sampleBoard)) {
         System.out.println("Kette gebildet.");
         return false;
       } else {
