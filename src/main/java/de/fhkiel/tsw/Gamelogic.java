@@ -478,11 +478,11 @@ public class Gamelogic implements Game {
   private boolean validateMove(Position from, Position to, Set<Position> sampleBoard) {
 
 
-    if (isFrogBetweenUs(from, to, sampleBoard)
+    if (isZusammenhaengend(from, to, sampleBoard)
         &&
-        isZusammenhaengend(from, to, sampleBoard)
+        isInStraightLine(from, to)
         &&
-        isInStraightLine(from, to)) {
+        isFrogBetweenUs(from, to, sampleBoard)) {
       System.out.println("Valid move");
       return true;
     }
@@ -518,51 +518,71 @@ public class Gamelogic implements Game {
     return verify;
   }
 
-  private boolean isFrogBetweenUs(Position from, Position to, Set<Position> sampleBoard) {
-    // Calculate direction vector considering parity of 'r'
-
-
-    return true;
-
-//    int dq = to.x() - from.x();
-//    int dr = to.y() - from.y();
+//  private boolean isFrogBetweenUs(Position from, Position to, Set<Position> sampleBoard) {
+//    // Calculate direction vector considering parity of 'r'
 //
-//    // Normalize the direction vector
-//    int gcd = gcd(Math.abs(dq), Math.abs(dr));
-//    dq /= gcd;
-//    dr /= gcd;
 //
-//    // Traverse from 'from' to 'to' in steps of the direction vector
-//    int q = from.x();
-//    int r = from.y();
-//    boolean hopFound = false;
-//
-//    while (q != to.x() || r != to.y()) {
-//      q += dq;
-//      r += dr;
-//      int finalQ = q;
-//      int finalR = r;
-//      Position current = sampleBoard.stream()
-//          .filter(p -> p.x() == finalQ && p.y() == finalR)
-//          .findFirst()
-//          .orElse(null);
-//      if (current == null) {
-//        return false; // Invalid move, position not part of the board
-//      }
-//      if (!current.frog().equals(Color.None) && !(q == to.x() && r == to.y())) {
-//        hopFound = true; // Found a frog in the path
-//      }
-//    }
-//
-//    if (hopFound) {
-//      System.out.println("Frog found in between");
-//    } else {
-//      System.out.println("No frog found in between");
-//    }
-//    return hopFound;
+//    return true;
+//  }
 
+  public boolean isFrogBetweenUs(Position from, Position to, Set<Position> sampleBoard) {
+    int q = from.x();
+    int r = from.y();
+    int dq = 0, dr = 0;
 
+    switch (currentDirection) {
+      case RIGHT -> dq = 1;
+      case LEFT -> dq = -1;
+      case UPPER_RIGHT -> {
+        dr = -1;
+        if (r % 2 != 0) {
+          dq = 1;
+        }
+      }
+      case UPPER_LEFT -> {
+        dr = -1;
+        if (r % 2 == 0) {
+          dq = -1;
+        }
+      }
+      case LOWER_RIGHT -> {
+        dr = 1;
+        if (r % 2 != 0) {
+          dq = 1;
+        }
+      }
+      case LOWER_LEFT -> {
+        dr = 1;
+        if (r % 2 == 0) {
+          dq = -1;
+        }
+      }
+    }
+
+    q += dq;
+    r += dr;
+
+    while (!(q == to.x() && r == to.y())) {
+      int finalQ = q;
+      int finalR = r;
+      Position current = sampleBoard.stream()
+          .filter(p -> p.x() == finalQ && p.y() == finalR)
+          .findFirst()
+          .orElse(null);
+      if (current == null) {
+        return false; // Invalid move, position not part of the board
+      }
+      if (!current.frog().equals(Color.None)) {
+        return true; // Found a frog in the path
+      }
+      q += dq;
+      r += dr;
+    }
+
+    System.out.println("No frog in the path");
+    return false; // No frog in the path
   }
+
 
   private boolean isInStraightLine(Position from, Position to, Set<Position> sampleBoard) {
     // Calculate direction vector
@@ -602,7 +622,6 @@ public class Gamelogic implements Game {
 
   private boolean checkDirection(int q1, int r1, int q2, int r2) {
 
-    //System.out.println("Started checkDirection");
     int size = board.size() + 1;
 
 
