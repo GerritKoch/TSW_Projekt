@@ -96,8 +96,10 @@ public class Gamelogic implements Game {
     colorList.add(Color.Red);
     colorList.add(Color.Blue);
     colorList.add(Color.Green);
-    colorList.add(Color.Black);
+    colorList.add(Color.White);
 
+    // might affect test results todo: remove
+    Collections.shuffle(colorList);
 
     if (numberOfPlayers < colorList.size()) {
       // If num is smaller, remove elements to decrease the size
@@ -234,7 +236,7 @@ public class Gamelogic implements Game {
       Position newPos = new Position(selectedFrog, position.x(), position.y(), position.border());
       if (anlegen(newPos)) {
         nachziehen();
-        //bewegen(null);
+
         selectedFrog = null;
         endTurn();
         System.out.println("Change to  BEWEGEN");
@@ -518,12 +520,6 @@ public class Gamelogic implements Game {
     return verify;
   }
 
-//  private boolean isFrogBetweenUs(Position from, Position to, Set<Position> sampleBoard) {
-//    // Calculate direction vector considering parity of 'r'
-//
-//
-//    return true;
-//  }
 
   public boolean isFrogBetweenUs(Position from, Position to, Set<Position> sampleBoard) {
     int q = from.x();
