@@ -1,9 +1,9 @@
-language : de
+#language:de
 
-  Funktionalität: (AoF-An-302) Die GUI darf Anlegen nur innerhalb der Positionen x[-50 bis 50] und y[-50 bis 50] zulassen.
+Funktionalität: (AoF-An-302) Die GUI darf Anlegen nur innerhalb der Positionen x[-50 bis 50] und y[-50 bis 50] zulassen.
 
-  Szenarrio: Peter versucht ein Stein  auf einer ungültigen Position zu platzieren.
+  Szenario: Peter versucht ein Stein  auf einer ungültigen Position zu platzieren.
 
-  Angenommen Das Spiel ist mit zwei Spielern gestartet.
-  Wenn Peter versucht ein Stein auf einer Position x[-51] und y[0] zu platzieren.
-  Dann wird eine Fehlermeldung angezeigt, dass die Position ungültig ist.
+    Angenommen Das Spiel ist mit zwei Spielern gestartet.
+    Wenn Peter versucht ein Stein auf einer Position x[-51] und y[0] zu platzieren.
+    Dann wird eine Fehlermeldung angezeigt, dass die Position ungültig ist.
