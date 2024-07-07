@@ -545,6 +545,7 @@ public class Gamelogic implements Game {
     if (getFrogInHandMapSize(currentPlayer.getPlayerColor()) >= 2) {
       return false;
     }
+
     if (currentGamePhase == GamePhase.NACHZIEHEN
         &&
         !gameBag.getFrogsInBag(currentPlayer.getPlayerColor()).isEmpty()) {

@@ -8,7 +8,7 @@ Funktionalität: (AoF-Al-117) Wenn mehr als 7 Steine einer Farbe im Spiel sind, 
     Wenn der erste Spieler acht Steine seiner Farbe nebeneinander hat
     Dann gewinnt der erste Spieler
 
-  Szenario: Peter möchte überprüfen, ob eine Farbe gewinnt, wenn mehr als 7 Steine einer Farbe im Spiel sind.
+  Szenario: Peter möchte überprüfen, ob eine andere Farbe gewinnt, wenn mehr als 7 Steine einer Farbe im Spiel sind.
   Testfall:
     Angenommen das Spiel läuft
     Wenn der zweite Spieler acht Steine seiner Farbe nebeneinander hat
