@@ -484,8 +484,8 @@ public class Gamelogic implements Game {
         frogsInHandMap.containsKey(currentPlayer) &&
         frogsInHandMap.get(currentPlayer).contains(frog)) {
       selectedFrog = frog;
-      frogsInHandMap.get(currentPlayer).remove(frog);
-      currentPlayer.getFrogsInHand().removeIf(frog1 -> frog1.getFrogColor() == frog);
+      //frogsInHandMap.get(currentPlayer).remove(frog);
+      //currentPlayer.getFrogsInHand().removeIf(frog1 -> frog1.getFrogColor() == frog);
       System.out.println("selectedFrogInHand(Player: " + player + ", Frog: " + frog + ")");
     } else {
       System.out.println("Invalid frog selection.");
@@ -1136,6 +1136,8 @@ public class Gamelogic implements Game {
   public boolean anlegen(Position pos) {
 
     if (getBoard().isEmpty()) {
+      frogsInHandMap.get(currentPlayer).remove(selectedFrog);
+      currentPlayer.getFrogsInHand().removeIf(frog1 -> frog1.getFrogColor() == selectedFrog);
       board.add(pos);
       currentGamePhase = GamePhase.NACHZIEHEN;
       return true;
@@ -1146,6 +1148,8 @@ public class Gamelogic implements Game {
       if (!hasNoChains(sampleBoard)) {
         return false;
       } else {
+        frogsInHandMap.get(currentPlayer).remove(selectedFrog);
+        currentPlayer.getFrogsInHand().removeIf(frog1 -> frog1.getFrogColor() == selectedFrog);
         board.add(pos);
         currentGamePhase = GamePhase.NACHZIEHEN;
 
