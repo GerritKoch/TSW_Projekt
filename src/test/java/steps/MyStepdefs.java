@@ -34,6 +34,8 @@ public class MyStepdefs {
 
   private boolean gameStarted;
   private boolean testResult;
+  private Position testPosition1;
+  private Position testPosition2;
 
   private Color playerColor;
   private Color frogColor;
@@ -692,5 +694,42 @@ public class MyStepdefs {
 
   @Dann("ist ein Stein der gezogenen Farbe weniger im Beutel")
   public void istEinSteinDerGezogenenFarbeWenigerImBeutel() {
+  }
+
+  @Wenn("es zwei Steine auf dem Spielfeld gibt")
+  public void esZweiSteineAufDemSpielfeldGibt() {
+    currentboard = container.logicUnderTest.getBoard();
+    currentPlayer = container.logicUnderTest.getCurrentPlayer();
+    testPosition1 = new Position(currentPlayer.getPlayerColor(), 0, 0, Color.None);
+    testPosition2 = new Position(currentPlayer.getPlayerColor(), 1, 0, Color.None);
+    container.logicUnderTest.setCurrentDirection(Gamelogic.Direction.RIGHT);
+    currentboard.add(testPosition1);
+    currentboard.add(testPosition2);
+
+
+  }
+
+  @Und("Peter einen Stein bewegen über den anderen möchte")
+  public void peterEinenSteinBewegenUberDenAnderenMochte() {
+
+
+    testResult =
+        container.logicUnderTest.isFrogBetweenUs(testPosition1,
+            new Position(Color.Black, 2, 0, Color.None), currentboard);
+
+  }
+
+  @Dann("wird der Stein bewegt")
+  public void wirdDerSteinBewegt() {
+
+    assertThat(testResult).isTrue();
+  }
+
+  @Und("Peter einen Stein bewegen in einer gerade Linie möchte")
+  public void peterEinenSteinBewegenInEinerGeradeLinieMochte() {
+
+    testResult =
+        container.logicUnderTest.isInStraightLine(testPosition1,
+            new Position(Color.Black, 2, 0, Color.None));
   }
 }

@@ -57,6 +57,10 @@ public class Gamelogic implements Game {
     return gameRound;
   }
 
+  public void setCurrentDirection(Direction currentDirection) {
+    this.currentDirection = currentDirection;
+  }
+
   public Direction currentDirection;
 
 
@@ -734,7 +738,7 @@ public class Gamelogic implements Game {
   }
 
 
-  private boolean isInStraightLine(Position from, Position to) {
+  public boolean isInStraightLine(Position from, Position to) {
 
     if (checkDirection(from.x(), from.y(), to.x(), to.y())) {
       System.out.println("Is in straight line");
