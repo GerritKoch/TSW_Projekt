@@ -396,7 +396,7 @@ public class Gamelogic implements Game {
   private boolean canMoveAnyFrog() {
     for (Position pos : board) {
       if (pos.frog() == currentPlayer.getPlayerColor()) {
-        for (Position neighbor : getNeigbours(pos, board)) {
+        for (Position neighbor : getNeighbours(pos, board)) {
           if (canMoveFrog(pos, neighbor)) {
             return true;
           }
@@ -788,11 +788,13 @@ public class Gamelogic implements Game {
     return false;
   }
 
+
   // DFS-Methode zur Zählung der Größe der verbundenen Komponente
 
   private boolean dfs(Position frog, Set<Position> visitedOld, Set<Position> chainOld,
                       int chainLength, int aufRuf, Set<Position> sampleBoard) {
 
+    System.out.println("Frog: " + frog.frog() + " at " + frog.x() + " " + frog.y());
 
     var visited = new HashSet<>(visitedOld);
     var chain = new HashSet<>(chainOld);
@@ -804,7 +806,7 @@ public class Gamelogic implements Game {
     System.out.println("Chain size: " + chain.size() + "\n");
 
 
-    List<Position> neighbors = getNeigbours(frog, sampleBoard);
+    List<Position> neighbors = getNeighbours(frog, sampleBoard);
     System.out.println("Neighbors in dfs: " + neighbors.size());
     if (neighbors.size() > 2) {
       return false;
@@ -820,8 +822,11 @@ public class Gamelogic implements Game {
 
           return true;
         }
-      } else if (chain.size() >= chainLength + 1 && chain.contains(neighbor)) {
-        System.out.println("\nChain size_786: " + chain.size());
+      } else if (chain.size() - 1 >= chainLength && chain.contains(neighbor)) {
+        System.out.println(
+            "\nCurrent neighbor: " + neighbor.frog() + " at (" + neighbor.x() + "," + neighbor.y() +
+                ") for aufRuf:" + aufRuf);
+        System.out.println("Chain size_786: " + chain.size());
         System.out.println("Return true from line 786 for aufRuf:" + aufRuf + "\n");
         return true;
       }
@@ -832,7 +837,7 @@ public class Gamelogic implements Game {
 
     // Check if there's an element in the chain that has only one neighbor
     for (Position position : chain) {
-      if (getNeigbours(position, sampleBoard).size() == 1 && chain.size() >= 3) {
+      if (getNeighbours(position, sampleBoard).size() == 1 && chain.size() >= 3) {
         System.out.println("\nChain size_797: " + chain.size());
         System.out.println("Return true from line 797 for aufRuf:" + aufRuf + "\n");
         return true;
@@ -843,23 +848,67 @@ public class Gamelogic implements Game {
     return false;
   }
 
-//  private boolean hatKetten(Set<Position> sampleboard) {
-//    Set<Position> visited = new HashSet<>();
-//    Set<Position> chain = new HashSet<>();
-//    for (Position frog : sampleboard) {
-//      if (!visited.contains(frog)) {
-//        chain.clear();
-//        if (dfs(frog, visited, chain, 3)) {
-//          System.out.println("Hat Ketten ");
-//          return true;
-//        }
-//      }
-//    }
-//    return false;
-//  }
+  public boolean dfs(Position current, Set<Position> visited, LinkedList<Position> kette,
+                     final int chainLength, Set<Position> sampleBoard) {
+    visited.add(current);
+    kette.add(current);
+
+    // Check if the chain is valid up to this point
+    if (kette.size() >= chainLength && istGueltigeKette(kette, chainLength, sampleBoard)) {
+      return true; // Valid chain found
+    }
+
+    // Continue searching only if we haven't reached the desired length
+    if (kette.size() < chainLength) {
+      for (Position neighbor : getNeighbours(current, sampleBoard)) {
+        if (!visited.contains(neighbor) &&
+            dfs(neighbor, visited, kette, chainLength, sampleBoard)) {
+          return true; // Successful chain found
+        }
+      }
+    }
+    // Backtrack if the path doesn't lead to a solution
+    visited.remove(current);
+    kette.removeLast(); // Efficiently remove the last element
+    return false;
+  }
+
+  private boolean istGueltigeKette(LinkedList<Position> kette, int chainLength,
+                                   Set<Position> sampleBoard) {
+    if (kette.size() < chainLength) {
+      return false; // Ensure the chain has the desired length
+    }
+
+    Position first = kette.getFirst();
+    Position last = kette.getLast();
+
+    boolean istValidesStart_Ende = istGueltigeStart_Ende(first, sampleBoard) &&
+        istGueltigeStart_Ende(last, sampleBoard)
+        && !(getNeighbours(first, sampleBoard).size() > 2 &&
+        getNeighbours(last, sampleBoard).size() > 2);
+
+    if (!istValidesStart_Ende) {
+      return false; // Start or end position doesn't meet criteria
+    }
+
+    // Check middle positions
+    for (int i = 1; i < kette.size() - 1; i++) {
+      Position mitte = kette.get(i);
+      if (getNeighbours(mitte, sampleBoard).size() != 2) {
+        return false; // Middle elements must have exactly 2 neighbors
+      }
+    }
+
+    return true; // Chain meets all criteria
+  }
+
+  private boolean istGueltigeStart_Ende(Position pos, Set<Position> sampleBoard) {
+    int neighborCount = getNeighbours(pos, sampleBoard).size();
+    return neighborCount == 1 || neighborCount <= 4;
+  }
 
 
-  private List<Position> getNeigbours(Position pos, Set<Position> board) {
+  private List<Position> getNeighbours(Position pos, Set<Position> board) {
     List<Position> neigborsByPosition = getBounderingNeighbours(pos);
 
     List<Position> actualNeighbors = new ArrayList<>();
@@ -1029,13 +1078,13 @@ public class Gamelogic implements Game {
   private boolean hasNoChains(Set<Position> sampleBoard) {
     boolean hatKetten = true;
     Set<Position> visited = new HashSet<>();
-    Set<Position> chain = new HashSet<>();
+    LinkedList<Position> chain = new LinkedList<>();
     for (Position frog : sampleBoard) {
       if (!visited.contains(frog)) {
-        System.out.println("Frog: " + frog.frog() + " at " + frog.x() + " " + frog.y());
         chain.clear();
         //System.out.println("kommt rein in hasNoChains");
-        if (dfs(frog, visited, chain, 3, 0, sampleBoard)) {
+        // if (dfs(frog, visited, chain, 3, 0, sampleBoard)) {
+        if (dfs(frog, visited, chain, 4, sampleBoard)) {
           System.out.println("Hat Ketten ");
           hatKetten = false;
           break;
