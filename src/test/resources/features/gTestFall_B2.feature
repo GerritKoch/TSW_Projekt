@@ -1,6 +1,6 @@
 #language:de
 
-Funktionalität: (AoF-B-202) Eine Bewegung erfolfgt nur in einer geraden Linie
+Funktionalität: (AoF-B-202) Eine Bewegung erfolgt nur in einer geraden Linie
 
   Szenario: Peter möchte einen Stein bewegen
     Angenommen das Spiel läuft

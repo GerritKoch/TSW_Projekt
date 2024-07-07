@@ -852,83 +852,83 @@ public class Gamelogic implements Game {
     return verify;
   }
 
-  /**
-   * Checks if there is a frog between two positions on the board in a specified direction.
-   *
-   * @param from         the starting position
-   * @param to           the destination position
-   * @param sampleBoard2 the sample board to check
-   * @return true if there is a frog between the two positions, false otherwise
-   */
+//  /**
+//   * Checks if there is a frog between two positions on the board in a specified direction.
+//   *
+//   * @param from         the starting position
+//   * @param to           the destination position
+//   * @param sampleBoard2 the sample board to check
+//   * @return true if there is a frog between the two positions, false otherwise
+//   */
+//  public boolean isFrogBetweenUs(Position from, Position to, Set<Position> sampleBoard2) {
+//    int[] direction = getDirectionDeltas(currentDirection, from.y());
+//    if (direction == null) {
+//      return false;
+//    }
+//
+//    int q = from.x() + direction[0];
+//    int r = from.y() + direction[1];
+//
+//    Set<Position> sampleBoard = initializeSampleBoard(sampleBoard2, from, to, direction);
+//
+//    return isFrogInPath(q, r, to, sampleBoard, direction);
+//  }
+//
+//  private int[] getDirectionDeltas(Direction direction, int y) {
+//    return switch (direction) {
+//      case RIGHT -> new int[]{1, 0};
+//      case LEFT -> new int[]{-1, 0};
+//      case UPPER_RIGHT -> new int[]{(y % 2 != 0) ? 1 : 0, -1};
+//      case UPPER_LEFT -> new int[]{(y % 2 == 0) ? -1 : 0, -1};
+//      case LOWER_RIGHT -> new int[]{(y % 2 != 0) ? 1 : 0, 1};
+//      case LOWER_LEFT -> new int[]{(y % 2 == 0) ? -1 : 0, 1};
+//      default -> null;
+//    };
+//  }
+//
+//  private Set<Position> initializeSampleBoard(Set<Position> sampleBoard2, Position from, Position to, int[] direction) {
+//    Set<Position> sampleBoard = new HashSet<>(sampleBoard2);
+//    int q = from.x() + direction[0];
+//    int r = from.y() + direction[1];
+//    while (!(q == to.x() && r == to.y()) && isWithinBounds(q, r)) {
+//      int finalQ = q;
+//      int finalR = r;
+//      if (sampleBoard.stream().noneMatch(p -> p.x() == finalQ && p.y() == finalR)) {
+//        sampleBoard.add(new Position(Color.None, q, r, Color.None));
+//      }
+//      q += direction[0];
+//      r += direction[1];
+//    }
+//    return sampleBoard;
+//  }
+//
+//  private boolean isWithinBounds(int q, int r) {
+//    return q >= -50 && r >= -50 && q <= 50 && r <= 50;
+//  }
+//
+//  private boolean isFrogInPath(int q, int r, Position to, Set<Position> sampleBoard, int[] direction) {
+//    while (!(q == to.x() && r == to.y())) {
+//      int finalQ = q;
+//      int finalR = r;
+//      Position current = sampleBoard.stream()
+//          .filter(p -> p.x() == finalQ && p.y() == finalR)
+//          .findFirst()
+//          .orElse(null);
+//      if (current == null) {
+//        logger.info("Current is null");
+//        return false;
+//      } else if (!current.frog().equals(Color.None)) {
+//        logger.info("Frog in the path");
+//        return true;
+//      }
+//      q += direction[0];
+//      r += direction[1];
+//    }
+//    logger.info("No frog in the path");
+//    return false;
+//  }
+
   public boolean isFrogBetweenUs(Position from, Position to, Set<Position> sampleBoard2) {
-    int[] direction = getDirectionDeltas(currentDirection, from.y());
-    if (direction == null) {
-      return false;
-    }
-
-    int q = from.x() + direction[0];
-    int r = from.y() + direction[1];
-
-    Set<Position> sampleBoard = initializeSampleBoard(sampleBoard2, from, to, direction);
-
-    return isFrogInPath(q, r, to, sampleBoard, direction);
-  }
-
-  private int[] getDirectionDeltas(Direction direction, int y) {
-    return switch (direction) {
-      case RIGHT -> new int[]{1, 0};
-      case LEFT -> new int[]{-1, 0};
-      case UPPER_RIGHT -> new int[]{(y % 2 != 0) ? 1 : 0, -1};
-      case UPPER_LEFT -> new int[]{(y % 2 == 0) ? -1 : 0, -1};
-      case LOWER_RIGHT -> new int[]{(y % 2 != 0) ? 1 : 0, 1};
-      case LOWER_LEFT -> new int[]{(y % 2 == 0) ? -1 : 0, 1};
-      default -> null;
-    };
-  }
-
-  private Set<Position> initializeSampleBoard(Set<Position> sampleBoard2, Position from, Position to, int[] direction) {
-    Set<Position> sampleBoard = new HashSet<>(sampleBoard2);
-    int q = from.x() + direction[0];
-    int r = from.y() + direction[1];
-    while (!(q == to.x() && r == to.y()) && isWithinBounds(q, r)) {
-      int finalQ = q;
-      int finalR = r;
-      if (sampleBoard.stream().noneMatch(p -> p.x() == finalQ && p.y() == finalR)) {
-        sampleBoard.add(new Position(Color.None, q, r, Color.None));
-      }
-      q += direction[0];
-      r += direction[1];
-    }
-    return sampleBoard;
-  }
-
-  private boolean isWithinBounds(int q, int r) {
-    return q >= -50 && r >= -50 && q <= 50 && r <= 50;
-  }
-
-  private boolean isFrogInPath(int q, int r, Position to, Set<Position> sampleBoard, int[] direction) {
-    while (!(q == to.x() && r == to.y())) {
-      int finalQ = q;
-      int finalR = r;
-      Position current = sampleBoard.stream()
-          .filter(p -> p.x() == finalQ && p.y() == finalR)
-          .findFirst()
-          .orElse(null);
-      if (current == null) {
-        logger.info("Current is null");
-        return false;
-      } else if (!current.frog().equals(Color.None)) {
-        logger.info("Frog in the path");
-        return true;
-      }
-      q += direction[0];
-      r += direction[1];
-    }
-    logger.info("No frog in the path");
-    return false;
-  }
-
-/*  public boolean isFrogBetweenUs(Position from, Position to, Set<Position> sampleBoard2) {
     int q = from.x();
     int r = from.y();
     int dq = 0;
@@ -1013,7 +1013,7 @@ public class Gamelogic implements Game {
 
     logger.info("No frog in the path");
     return false; // No frog in the path
-  }*/
+  }
 
   /**
    * Checks if two positions are in a straight line.
@@ -1041,106 +1041,105 @@ public class Gamelogic implements Game {
    * @param r2 the y-coordinate of the destination position
    * @return true if the positions are in a straight line, false otherwise
    */
+//  private boolean checkDirection(int q1, int r1, int q2, int r2) {
+//    int size = board.size() + 1;
+//
+//    for (int i = 0; i < size; i++) {
+//      if (checkRight(q1, r1, q2, r2) || checkLeft(q1, r1, q2, r2) || checkUpperRight(q1, r1, q2, r2)
+//          || checkLowerRight(q1, r1, q2, r2) || checkUpperLeft(q1, r1, q2, r2) ||
+//          checkLowerLeft(q1, r1, q2, r2)) {
+//        return true;
+//      }
+//    }
+//    return false;
+//  }
+//
+//  private boolean checkRight(int q1, int r1, int q2, int r2) {
+//    if (r1 == r2 && q1 + 1 == q2) {
+//      currentDirection = Direction.RIGHT;
+//      logger.info("Is Right");
+//      return true;
+//    }
+//    return false;
+//  }
+//
+//  private boolean checkLeft(int q1, int r1, int q2, int r2) {
+//    if (r1 == r2 && q1 - 1 == q2) {
+//      currentDirection = Direction.LEFT;
+//      logger.info("Is Left");
+//      return true;
+//    }
+//    return false;
+//  }
+//
+//  private boolean checkUpperRight(int q1, int r1, int q2, int r2) {
+//    if ((r1 == 0 || Math.abs(r1) % 2 == 0)) {
+//      if (--r1 == r2 && q1 == q2) {
+//        currentDirection = Direction.UPPER_RIGHT;
+//        logger.info("Is Upper Right");
+//        return true;
+//      }
+//    } else {
+//      if (--r1 == r2 && ++q1 == q2) {
+//        currentDirection = Direction.UPPER_RIGHT;
+//        logger.info("Is Upper Right");
+//        return true;
+//      }
+//    }
+//    return false;
+//  }
+//
+//  private boolean checkLowerRight(int q1, int r1, int q2, int r2) {
+//    if ((r1 == 0 || Math.abs(r1) % 2 == 0)) {
+//      if (++r1 == r2 && q1 == q2) {
+//        currentDirection = Direction.LOWER_RIGHT;
+//        logger.info("Is Lower Right");
+//        return true;
+//      }
+//    } else {
+//      if (++r1 == r2 && ++q1 == q2) {
+//        currentDirection = Direction.LOWER_RIGHT;
+//        logger.info("Is Lower Right");
+//        return true;
+//      }
+//    }
+//    return false;
+//  }
+//
+//  private boolean checkUpperLeft(int q1, int r1, int q2, int r2) {
+//    if ((r1 == 0 || Math.abs(r1) % 2 == 0)) {
+//      if (--r1 == r2 && --q1 == q2) {
+//        currentDirection = Direction.UPPER_LEFT;
+//        logger.info("Is Upper Left");
+//        return true;
+//      }
+//    } else {
+//      if (--r1 == r2 && q1 == q2) {
+//        currentDirection = Direction.UPPER_LEFT;
+//        logger.info("Is Upper Left");
+//        return true;
+//      }
+//    }
+//    return false;
+//  }
+//
+//  private boolean checkLowerLeft(int q1, int r1, int q2, int r2) {
+//    if ((r1 == 0 || Math.abs(r1) % 2 == 0)) {
+//      if (++r1 == r2 && --q1 == q2) {
+//        currentDirection = Direction.LOWER_LEFT;
+//        logger.info("Is Lower Left");
+//        return true;
+//      }
+//    } else {
+//      if (++r1 == r2 && q1 == q2) {
+//        currentDirection = Direction.LOWER_LEFT;
+//        logger.info("Is Lower Left");
+//        return true;
+//      }
+//    }
+//    return false;
+//  }
   private boolean checkDirection(int q1, int r1, int q2, int r2) {
-    int size = board.size() + 1;
-
-    for (int i = 0; i < size; i++) {
-      if (checkRight(q1, r1, q2, r2) || checkLeft(q1, r1, q2, r2) || checkUpperRight(q1, r1, q2, r2)
-          || checkLowerRight(q1, r1, q2, r2) || checkUpperLeft(q1, r1, q2, r2) ||
-          checkLowerLeft(q1, r1, q2, r2)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean checkRight(int q1, int r1, int q2, int r2) {
-    if (r1 == r2 && q1 + 1 == q2) {
-      currentDirection = Direction.RIGHT;
-      logger.info("Is Right");
-      return true;
-    }
-    return false;
-  }
-
-  private boolean checkLeft(int q1, int r1, int q2, int r2) {
-    if (r1 == r2 && q1 - 1 == q2) {
-      currentDirection = Direction.LEFT;
-      logger.info("Is Left");
-      return true;
-    }
-    return false;
-  }
-
-  private boolean checkUpperRight(int q1, int r1, int q2, int r2) {
-    if ((r1 == 0 || Math.abs(r1) % 2 == 0)) {
-      if (--r1 == r2 && q1 == q2) {
-        currentDirection = Direction.UPPER_RIGHT;
-        logger.info("Is Upper Right");
-        return true;
-      }
-    } else {
-      if (--r1 == r2 && ++q1 == q2) {
-        currentDirection = Direction.UPPER_RIGHT;
-        logger.info("Is Upper Right");
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean checkLowerRight(int q1, int r1, int q2, int r2) {
-    if ((r1 == 0 || Math.abs(r1) % 2 == 0)) {
-      if (++r1 == r2 && q1 == q2) {
-        currentDirection = Direction.LOWER_RIGHT;
-        logger.info("Is Lower Right");
-        return true;
-      }
-    } else {
-      if (++r1 == r2 && ++q1 == q2) {
-        currentDirection = Direction.LOWER_RIGHT;
-        logger.info("Is Lower Right");
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean checkUpperLeft(int q1, int r1, int q2, int r2) {
-    if ((r1 == 0 || Math.abs(r1) % 2 == 0)) {
-      if (--r1 == r2 && --q1 == q2) {
-        currentDirection = Direction.UPPER_LEFT;
-        logger.info("Is Upper Left");
-        return true;
-      }
-    } else {
-      if (--r1 == r2 && q1 == q2) {
-        currentDirection = Direction.UPPER_LEFT;
-        logger.info("Is Upper Left");
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean checkLowerLeft(int q1, int r1, int q2, int r2) {
-    if ((r1 == 0 || Math.abs(r1) % 2 == 0)) {
-      if (++r1 == r2 && --q1 == q2) {
-        currentDirection = Direction.LOWER_LEFT;
-        logger.info("Is Lower Left");
-        return true;
-      }
-    } else {
-      if (++r1 == r2 && q1 == q2) {
-        currentDirection = Direction.LOWER_LEFT;
-        logger.info("Is Lower Left");
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /*private boolean checkDirection(int q1, int r1, int q2, int r2) {
     int size = board.size() + 1;
 
     int leftQ1 = q1;
@@ -1260,7 +1259,7 @@ public class Gamelogic implements Game {
     }
 
     return false;
-  }*/
+  }
 
 
   /**
