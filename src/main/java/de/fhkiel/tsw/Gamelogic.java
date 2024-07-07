@@ -833,7 +833,7 @@ public class Gamelogic implements Game {
    * @param sampleBoard the sample board to check
    * @return true if the board remains connected, false otherwise
    */
-  private boolean isZusammenhaengend(Position to, Set<Position> sampleBoard) {
+  public boolean isZusammenhaengend(Position to, Set<Position> sampleBoard) {
     boolean verify = false;
     var listBoard = sampleBoard.stream().toList();
     var visited = new HashSet<Position>();
@@ -1676,7 +1676,7 @@ public class Gamelogic implements Game {
    * @param sampleBoard the set of positions representing the board
    * @return true if there are no chains, false otherwise
    */
-  private boolean hasNoChains(Set<Position> sampleBoard) {
+  public boolean hasNoChains(Set<Position> sampleBoard) {
     boolean hatKetten = true;
     Set<Position> visited = new HashSet<>();
     LinkedList<Position> chain = new LinkedList<>();

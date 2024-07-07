@@ -732,4 +732,55 @@ public class MyStepdefs {
         container.logicUnderTest.isInStraightLine(testPosition1,
             new Position(Color.Black, 2, 0, Color.None));
   }
+
+  @Angenommen("Peter ist mit einer gültigen Bewegung fertig")
+  public void peterIstMitEinerGultigenBewegungFertig() {
+    dasSpielLauft();
+    esZweiSteineAufDemSpielfeldGibt();
+    currentboard.remove(testPosition1);
+    testPosition1 = new Position(currentPlayer.getPlayerColor(), 2, 0, Color.None);
+    currentboard.add(testPosition1);
+
+  }
+
+  @Wenn("es geprüft wird, ob alle Steine zusammenhängen")
+  public void esGepruftWirdObAlleSteineZusammenhangen() {
+
+    testResult = container.logicUnderTest.isZusammenhaengend(testPosition1, currentboard);
+  }
+
+  @Dann("sollen alle Steine zusammenhängen")
+  public void sollenAlleSteineZusammenhangen() {
+
+    assertThat(testResult).isTrue();
+  }
+
+  @Wenn("es geprüft wird, ob keine Kette entsteht")
+  public void esGepruftWirdObKeineKetteEntsteht() {
+
+    testResult = container.logicUnderTest.hasNoChains(currentboard);
+  }
+
+  @Dann("soll keine Kette entstehen")
+  public void sollKeineKetteEntstehen() {
+    assertThat(testResult).isTrue();
+  }
+
+  @Wenn("es geprüft wird, ob jeder Stein mindestens eine Verbindung hat")
+  public void esGepruftWirdObJederSteinMindestensEineVerbindungHat() {
+    container.logicUnderTest.setBoard(currentboard);
+
+    for (Position position : currentboard) {
+      testResult = container.logicUnderTest.hasNeighbour(position);
+      if (!testResult) {
+        break;
+      }
+    }
+
+  }
+
+  @Dann("soll jeder Stein mindestens eine Verbindung haben")
+  public void sollJederSteinMindestensEineVerbindungHaben() {
+    assertThat(testResult).isTrue();
+  }
 }
