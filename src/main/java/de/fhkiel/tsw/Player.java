@@ -4,33 +4,32 @@ import de.fhkiel.tsw.armyoffrogs.Color;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 
 
 public class Player {
 
-    private Color playerColor;
-    private List<Frog> myFrogs;
-    private myFrogList frogsInHand;
-    private Gamelogic currentGame;
-    public boolean isMyTurn;
-    public Player (Color inputColor){
+  private Color playerColor;
+  private List<Frog> myFrogs;
+  private myFrogList frogsInHand;
+  private Gamelogic currentGame;
+  public boolean isMyTurn;
 
-        myFrogs = new ArrayList<>();
-        frogsInHand = new myFrogList();
+  public Player(Color inputColor) {
 
-        this.playerColor = inputColor;
-        for(int i = 0; i < 10; i++){
-            myFrogs.add(new Frog(inputColor));
-        }
+    myFrogs = new ArrayList<>();
+    frogsInHand = new myFrogList();
+
+    this.playerColor = inputColor;
+    for (int i = 0; i < 10; i++) {
+      myFrogs.add(new Frog(inputColor));
     }
+  }
 
-    private enum Actions {
-        BEWEGEN,
-        ANLEGEN,
-        NACHZIEHEN
-    }
+  private enum Actions {
+    BEWEGEN,
+    ANLEGEN,
+    NACHZIEHEN
+  }
 
 //    private Map<Actions, Runnable> actions = Map.of(
 //        Actions.BEWEGEN, () -> {
@@ -47,41 +46,40 @@ public class Player {
 //        }
 //    );
 
-    public Color getPlayerColor() {
+  public Color getPlayerColor() {
 
-        return playerColor;
-    }
+    return playerColor;
+  }
 
-    public List<Frog> getFrogs() {
+  public List<Frog> getFrogs() {
 
-        return myFrogs;
-    }
+    return myFrogs;
+  }
 
-    public void setPlayerColor(Color playerColor) {
+  public void setPlayerColor(Color playerColor) {
 
-        this.playerColor = playerColor;
-    }
+    this.playerColor = playerColor;
+  }
 
-    public List<Frog> getFrogsInHand() {
+  public List<Frog> getFrogsInHand() {
 
-        return frogsInHand;
-    }
+    return frogsInHand;
+  }
 
-    public void setFrogsInHand(Frog frogInHand) {
+  public void setFrogsInHand(Frog frogInHand) {
 
-        this.frogsInHand.add(frogInHand);
-    }
+    this.frogsInHand.add(frogInHand);
+  }
 
-    public void setMyFrogs(List<Frog> myFrogs) {
+  public void setMyFrogs(List<Frog> myFrogs) {
 
-        this.myFrogs = myFrogs;
-    }
+    this.myFrogs = myFrogs;
+  }
 
-    public void setMyFrogs(Frog frog) {
+  public void setMyFrogs(Frog frog) {
 
-        this.myFrogs.add(frog);
-    }
-
+    this.myFrogs.add(frog);
+  }
 
 
 }

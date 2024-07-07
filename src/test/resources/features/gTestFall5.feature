@@ -14,11 +14,11 @@ Funktionalität: (AoF-Al-105) Die Anzahl der Spielsteine einer Farbe beträgt 10
   #1 = rot
     #2 = blue
     #3 = grün
-    #4 = schwarz
+    #4 = weiß
 
     Beispiele:
-    | Spieler | Zuege | beliebige Farbe |
-    | 2       | 0     | 1               |
-    | 3       | 0     | 2               |
-    | 4       | 0     | 3               |
+      | Spieler | Zuege | beliebige Farbe |
+      | 2       | 0     | 1               |
+      | 3       | 0     | 2               |
+      | 4       | 0     | 3               |
 

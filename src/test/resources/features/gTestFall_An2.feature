@@ -6,4 +6,4 @@ Funktionalität: (AoF-An-302) Die GUI darf Anlegen nur innerhalb der Positionen 
 
     Angenommen Das Spiel ist mit zwei Spielern gestartet.
     Wenn Peter versucht ein Stein auf einer Position x[-51] und y[0] zu platzieren.
-    Dann wird eine Fehlermeldung angezeigt, dass die Position ungültig ist.
+    Dann dieses Stein wird nicht platziert.

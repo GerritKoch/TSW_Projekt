@@ -34,6 +34,10 @@ public class Gamelogic implements Game {
   private Color selectedFrog;
   private Position selectedPosition;
 
+  private List<Frog> originalFrogsList;
+  private List<Frog> shuffledFrogsList;
+
+
   public GamePhase getCurrentGamePhase() {
     return currentGamePhase;
   }
@@ -44,6 +48,7 @@ public class Gamelogic implements Game {
   public Player getCurrentPlayer() {
     return currentPlayer;
   }
+
 
   private Player currentPlayer;
   private Map<Player, List<Color>> frogsInHandMap;
@@ -123,7 +128,7 @@ public class Gamelogic implements Game {
     colorList.add(Color.Green);
     colorList.add(Color.White);
 
-    // might affect test results todo: remove
+
     Collections.shuffle(colorList);
 
     if (numberOfPlayers < colorList.size()) {
@@ -143,7 +148,13 @@ public class Gamelogic implements Game {
     selectedFrog = null;
     spielLaueft = true;
     gameBag = new Bag(numberOfPlayers * 10, colorList);
-    Collections.shuffle(gameBag.getFrogsInBag());
+    originalFrogsList = gameBag.getFrogsInBag();
+    shuffledFrogsList = new ArrayList<>(originalFrogsList);
+    Collections.shuffle(shuffledFrogsList);
+    gameBag.setFrogsInBag(shuffledFrogsList);
+
+    shuffledFrogsList = gameBag.getFrogsInBag();
+
 
     for (int i = 0; i < numberOfPlayers; i++) {
       takeFrogFromBag();
@@ -158,6 +169,29 @@ public class Gamelogic implements Game {
     selectedPosition = null;
 
     return true;
+  }
+
+
+  private boolean isShuffled(List<Frog> originalList, List<Frog> shuffledList) {
+    // Check if both lists are of the same size
+    if (originalList.size() != shuffledList.size()) {
+      return true; // If sizes differ, it's considered shuffled
+    }
+
+    // Iterate through the lists and compare each element
+    for (int i = 0; i < originalList.size(); i++) {
+      if (!originalList.get(i).getFrogColor().equals(shuffledList.get(i).getFrogColor())) {
+        return true; // Found an element that is out of place
+      }
+    }
+
+    // If we reach here, every element was in its original place
+    return false;
+
+  }
+
+  public boolean isShuffled() {
+    return isShuffled(originalFrogsList, shuffledFrogsList);
   }
 
 
@@ -220,6 +254,19 @@ public class Gamelogic implements Game {
 
       for (Color color1 : entry.getValue()) {
         if (color1 == color) {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+
+  public int getFrogInPlayerHandMapSize(Player player) {
+    int count = 0;
+    for (Map.Entry<Player, List<Color>> entry : frogsInHandMap.entrySet()) {
+
+      for (Color color1 : entry.getValue()) {
+        if (entry.getKey() == player) {
           count++;
         }
       }
@@ -298,6 +345,14 @@ public class Gamelogic implements Game {
 
   }
 
+  public boolean jumpMove() {
+    if (!checkMovePossible()) {
+      currentGamePhase = GamePhase.ANLEGEN;
+      return false;
+    }
+    return true;
+  }
+
   public void changePhase() {
     if (currentGamePhase == GamePhase.ANLEGEN) {
       currentGamePhase = GamePhase.BEWEGEN;
@@ -354,11 +409,23 @@ public class Gamelogic implements Game {
     return false;
   }
 
-  public void nachziehen() {
-    if (currentGamePhase == GamePhase.NACHZIEHEN) {
-      takeFrogFromBag(currentPlayer);
+  public boolean nachziehen() {
 
+    if (getFrogInHandMapSize(currentPlayer.getPlayerColor()) >= 2) {
+      return false;
     }
+    if (currentGamePhase == GamePhase.NACHZIEHEN
+        &&
+        !gameBag.getFrogsInBag(currentPlayer.getPlayerColor()).isEmpty()) {
+      takeFrogFromBag(currentPlayer);
+      return true;
+    }
+
+    return false;
+  }
+
+  public void setCurrentGamePhase(GamePhase currentGamePhase) {
+    this.currentGamePhase = currentGamePhase;
   }
 
   private boolean canMoveFrog(Position from, Position to) {
@@ -387,7 +454,7 @@ public class Gamelogic implements Game {
     return true;
   }
 
-  private boolean checkMovePossible() {
+  public boolean checkMovePossible() {
 
     boolean movePossible = false;
     var color = currentPlayer.getPlayerColor();
@@ -426,19 +493,20 @@ public class Gamelogic implements Game {
    *
    * @param destinedPosition The position where the frog is to be moved.
    */
-  public void bewegen(Position destinedPosition) {
+  public boolean bewegen(Position destinedPosition) {
 
 
     //List<Position> possibleMovePositions = possibleMovePositions();
 
     if (sampleMovePositions == null || sampleMovePositions.isEmpty()) {
       System.out.println("No possible move positions.");
-      return;
+
+      return false;
     }
 
     if (!sampleMovePositions.contains(destinedPosition)) {
       System.out.println("Invalid move.");
-      return;
+      return false;
     }
 
 
@@ -449,7 +517,7 @@ public class Gamelogic implements Game {
     sampleBoard.add(newPos);
     if (!validateInitialMoves(selectedPosition, newPos, sampleBoard)) {
       System.out.println("Invalid move.");
-      return;
+      return false;
     } else {
       board = sampleBoard;
       System.out.println("Moving frog from " + selectedPosition + " to " + newPos);
@@ -461,6 +529,8 @@ public class Gamelogic implements Game {
       selectedPosition = null;
       currentGamePhase = GamePhase.ANLEGEN;
     }
+
+    return true;
   }
 
   /**
@@ -1063,6 +1133,10 @@ public class Gamelogic implements Game {
     return true;
   }
 
+  public void setBoard(Set<Position> board) {
+    this.board = board;
+  }
+
   // Check if there are chains of 3 individual connections between frogs
   private boolean hasNoChains(Set<Position> sampleBoard) {
     boolean hatKetten = true;
@@ -1121,6 +1195,10 @@ public class Gamelogic implements Game {
   }
 
   public boolean anlegen(Position pos) {
+
+    if (pos.x() < -50 || pos.y() > 50) {
+      return false;
+    }
 
     if (getBoard().isEmpty()) {
       frogsInHandMap.get(currentPlayer).remove(selectedFrog);

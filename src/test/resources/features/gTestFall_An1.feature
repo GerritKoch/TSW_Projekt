@@ -5,6 +5,6 @@ Funktionalität: (AoF-An-301) Die GUI muss die Position der Spielsteine abfragen
 
   Szenario: Peter möchte die Position eines Spielsteins abfragen.
 
-    Angenommen Ein Stein wird auf Position (1,1) gesetzt.
+    Angenommen Ein Stein wird auf Position 1  1 gesetzt.
     Wenn Peter die Position des Steins abfrägt
-    Dann erhält er die Position (1,1).
+    Dann erhält er die Position 1  1 .
